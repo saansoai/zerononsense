@@ -1,8 +1,49 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "oxc"],
+  "plugins": ["react", "jsx-a11y", "oxc", "import", "unicorn"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": {
+    "browser": true,
+    "es2024": true
+  },
   "rules": {
     "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
+    "react/react-in-jsx-scope": "off",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "jsx-a11y/alt-text": "error",
+    "jsx-a11y/anchor-has-content": "error",
+    "jsx-a11y/anchor-is-valid": "error",
+    "jsx-a11y/aria-props": "error",
+    "jsx-a11y/aria-role": "error",
+    "jsx-a11y/heading-has-content": "error",
+    "jsx-a11y/html-has-lang": "error",
+    "jsx-a11y/iframe-has-title": "error",
+    "jsx-a11y/img-redundant-alt": "error",
+    "jsx-a11y/label-has-associated-control": "error",
+    "jsx-a11y/no-autofocus": "error",
+    "jsx-a11y/no-redundant-roles": "error",
+    "jsx-a11y/role-has-required-aria-props": "error",
+    "jsx-a11y/tabindex-no-positive": "error",
+
+    // Off by design: the wordmarks are CSS masks on a span, so there is no
+    // <img> to prefer and role="img" is the only way to name them, and the
+    // hero's dot pair is a group of buttons rather than a fieldset.
+        "jsx-a11y/prefer-tag-over-role": "off",
+    // Side-effect CSS imports are how Vite loads the stylesheet.
+    "import/no-unassigned-import": "off",
+    "unicorn/prefer-dom-node-append": "error"
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.test.jsx", "scripts/**/*.mjs"],
+      "env": { "node": true },
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

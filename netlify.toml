@@ -1,0 +1,48 @@
+# The repository root holds both the site and the design-system package, so the
+# build runs inside website/ and publishes website/dist.
+[build]
+  base = "website"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# public/404.html is picked up automatically by Netlify for unmatched paths.
+
+# Vite fingerprints everything in assets/, so those are immutable. Nothing else
+# is, least of all index.html.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Pack shots and hero frames change only when the brand supplies new artwork,
+# and they are the heaviest thing on the page.
+[[headers]]
+  for = "/packs/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/hero/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    # A Content-Security-Policy is deliberately not set here. The form POSTs to
+    # whatever VITE_CONTACT_ENDPOINT names, so connect-src cannot be written
+    # until that endpoint is chosen. Once it is, add:
+    #
+    #   Content-Security-Policy = "default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://plausible.io <your form endpoint origin>; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"

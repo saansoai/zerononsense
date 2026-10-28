@@ -20,7 +20,9 @@ export default function Nav() {
 
   useEffect(() => {
     const el = sentinel.current;
-    if (!el) return undefined;
+    // Without an observer the plate simply stays in its floating state, which
+    // is the state it is designed in — no listener, no fallback to maintain.
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
     // The sentinel sits one nav-height down the page, so it leaves the viewport
     // exactly when the hero has scrolled under the header.
     const io = new IntersectionObserver(([entry]) => setSolid(!entry.isIntersecting));

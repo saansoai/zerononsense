@@ -7,14 +7,16 @@
 const PHRASE = ['Zero Secrets', 'Zero Shortcuts', '100% Ingredient Transparency', 'No Preservatives'];
 
 export default function Ticker() {
-  const run = [...PHRASE, ...PHRASE, ...PHRASE];
+  // Three passes so the row runs past the viewport edge on a wide screen.
+  // Each span carries which pass it came from, so no key is an array index.
+  const run = [0, 1, 2].flatMap((pass) => PHRASE.map((text) => ({ key: `${pass}-${text}`, text })));
 
   return (
     <div className="ticker" aria-hidden="true">
       <div className="ticker-row">
-        {run.map((text, i) => (
-          <span key={`${text}-${i}`}>
-            <span className="ast">*</span> {text}
+        {run.map((item) => (
+          <span key={item.key}>
+            <span className="ast">*</span> {item.text}
           </span>
         ))}
       </div>

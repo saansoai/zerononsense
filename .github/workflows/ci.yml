@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Both jobs are seconds long; they run on every push so a regression in the
+# brand rules (see website/src/__tests__/site.test.jsx) cannot reach main.
+jobs:
+  website:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: website/.nvmrc
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Design system in sync
+        run: npm run sync:ds -- --check
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
