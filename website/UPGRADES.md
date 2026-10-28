@@ -1,12 +1,17 @@
 # Zero Nonsense website — upgrade list
 
-> **Status, 2026-10-18.** The homepage was rebuilt after this audit — see
-> [BRAND-AUDIT.md](BRAND-AUDIT.md). Sections 1, 2, 3 and most of 4 and 5 are now
-> **done**: the `h1`, anchor offsets, focus styles, mobile menu and skip link;
-> every contrast pairing; all SEO and sharing metadata; the dead assets; the
-> product framing and the real label data. What remains open is listed at the end
-> of BRAND-AUDIT §5 — chiefly the framer-motion bundle weight (§4), the contact
-> form and remaining pages (§5), and all of §6 below, which is untouched.
+> **Status, 2026-10-28.** Sections 1, 2, 3 and 4 are **done**, and so is all of
+> section 6. The homepage was rebuilt after the original audit — see
+> [BRAND-AUDIT.md](BRAND-AUDIT.md) — and the engineering backlog below has since
+> been worked through: framer-motion is gone (§4), `#contact` is a real form
+> (§5), and the repository now has version control, CI, tests, deploy config, a
+> design-system sync check, a 404 page and env-gated analytics (§5, §6).
+>
+> What remains open is **content and brand decisions**, not code: the
+> photography, the blue SKU's name, the OBEIT print spelling, the Zero30 back
+> panel and its render's net weight, and the question of whether the site should
+> grow past one page. Those are listed at the end of BRAND-AUDIT §5. Section 7
+> below is untouched.
 
 Audit done against a running `npm run dev` (Vite 8.3.2, http://localhost:5173) plus a
 production `vite build`, on 2026-10-18. Lint is clean, the build succeeds in ~260ms, and
@@ -116,6 +121,11 @@ Also in this bucket:
 
 ## 4. Performance
 
+**Done (2026-10-28).** framer-motion is removed. `Reveal` runs on an
+IntersectionObserver with the transition in CSS, and the hero crossfade is a
+keyed remount plus a keyframe. 374 kB → 251 kB (118 → 77 kB gzip); what is left
+is React and the page's own content. The original note follows.
+
 **366 kB of JS (116 kB gzip) for a static one-page marketing site** is the headline number, and
 nearly all of it is framer-motion. Options, cheapest first:
 
@@ -154,6 +164,11 @@ removes a third-party round trip from the critical path.
 
 Product decisions rather than code, but they are what stands between this and a launchable site:
 
+- ~~**"Enquire" is a dead end.**~~ **Done (2026-10-28).** `#contact` is a form
+  on its own band: POSTs JSON to `VITE_CONTACT_ENDPOINT`, falls back to the
+  visitor's mail client when none is set, honeypot, live status. **The endpoint
+  still has to be chosen and set** — until it is, the form behaves like the old
+  mailto. Original note:
 - **"Enquire" is a dead end.** Every product card's CTA and the nav's *Contact* link scroll to
   the footer, where the only contact mechanism is a `mailto:`. There is no form, no backend, no
   confirmation. For a brand running paid traffic this is the conversion leak.
@@ -168,37 +183,64 @@ Product decisions rather than code, but they are what stands between this and a 
   ([products.js](src/components/products.js)) and Saansure's claim literally reads *"Positioning
   and claims to be confirmed with the brand."* Fine for a review build, must not reach
   production — consider gating it behind an env flag so it cannot ship by accident.
-- No analytics, no cookie/consent handling, no 404 page.
+- ~~No analytics, no 404 page.~~ **Done (2026-10-28).** `public/404.html` is
+  standalone, so it renders even when the bundle is what failed.
+  `src/analytics.js` injects Plausible only when `VITE_ANALYTICS_DOMAIN` is set;
+  Plausible sets no cookies, which is why there is still no consent banner.
+  Swapping in a provider that does set cookies means adding one.
 - No newsletter capture, no stockist / where-to-buy, no FSSAI or nutrition-panel disclosure —
   all expected on an Indian packaged-nutrition site.
 
 ---
 
-## 6. Engineering and infrastructure
+## 6. Engineering and infrastructure — done
 
-- **This is not a git repository.** No version control at all, on either the website or the
-  design-system package. `git init` is the first thing to do; the `.gitignore` is already
-  written and correct.
-- **No deployment config.** No `netlify.toml` / `vercel.json` / workflow file, and
-  `vite.config.js` sets no `base`, so a subpath deploy will break asset URLs.
-- **No CI.** `lint` and `build` both pass and both take under a second — cheap to gate on.
-- **No tests of any kind.** For a site this size a single smoke test (renders, no console
-  errors, headings present) plus an axe-core assertion would cover most of sections 1 and 2
-  permanently.
-- **The design system is copied, not depended on.** `src/styles/*` and `src/ds/*` are manual
-  copies of `../Zero Nonsense Design System/`, with the README asking future editors to re-copy
-  by hand. That will drift. Make the package a local workspace dependency
-  (`"@zn/design-system": "file:../Zero Nonsense Design System"`) so updates flow in and the
-  "don't edit these" rule is enforced by the module boundary rather than by a note.
-- **Near-empty lint config, no formatter.** `.oxlintrc.json` enables two rules. Turning on the
-  full `react` and a `jsx-a11y` rule set would have caught the missing `h1` and the mouse-only
-  handlers.
-- **`reducedMotion="user"` is correct but undiscoverable.** This machine has Windows Reduced
-  Motion on, so the site renders its static fallback and the 3D work is invisible until someone
-  reads the README. Worth a dev-only toggle rather than editing `App.jsx` to preview.
-- No `.nvmrc` or `engines` field pinning the Node version.
+All of this section was closed on 2026-10-28. Kept here as a record of what was
+decided, because several of the decisions are not obvious from the files.
 
----
+- **Version control.** `git init` at the repository root, covering the site and
+  the design-system package together — the sync check below only means something
+  if both are in the same history. `.gitattributes` normalises line endings so a
+  Windows checkout does not rewrite every file.
+- **Deployment.** `netlify.toml` at the root (`base = "website"`) and
+  `website/vercel.json`. Both set immutable caching on the fingerprinted
+  `assets/`, a week on pack artwork and hero frames, and no-cache on HTML, plus
+  `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and
+  `Permissions-Policy`. A CSP is written out as a comment rather than set,
+  because `connect-src` cannot be finished until the contact endpoint is chosen.
+  Vite's `base` now reads `BASE_PATH`, so a subpath deploy no longer breaks
+  asset URLs.
+- **CI.** `.github/workflows/ci.yml` runs lint, the design-system sync check,
+  the tests and the build on every push and pull request. The four take seconds
+  together.
+- **Tests.** vitest + jsdom + testing-library, in `src/__tests__/`. The suite is
+  aimed at the brand rules the README calls regressions rather than at
+  coverage: the forbidden band adjacencies (p36), one `h1`, a resolving skip
+  link, an alt on every image, every in-page anchor pointing at a real id, and
+  the reveal content present with no IntersectionObserver. The contact tests
+  cover all four submit paths. vitest is on 5.x because 3.x cannot drive Vite
+  8's plugin pipeline.
+
+  Note `vitest.setup.js`: jsdom has neither `matchMedia` nor
+  `IntersectionObserver`. `matchMedia` is stubbed, because every real browser
+  has it. `IntersectionObserver` is deliberately left missing, so the
+  no-observer path in `Nav` and `Reveal` stays exercised on every run.
+- **The design system is still copied, but the copy is now reproducible.**
+  `npm run sync:ds` rewrites `src/styles/` and `src/ds/` from the package and
+  reapplies the two documented divergences; `npm run sync:ds -- --check` fails
+  CI on drift. A patch whose anchor text has disappeared from the package is a
+  hard error, not a silent skip — that is the case where someone has to decide
+  what the override means now. A `file:` workspace dependency was the original
+  suggestion and is still the better end state, but the package ships no
+  `package.json` and no entry point, so it would have to be given one first.
+- **Lint.** `react`, `jsx-a11y`, `import`, `unicorn` and `oxc`, with the
+  correctness category as errors. Two rules are off with the reason written
+  beside them in `.oxlintrc.json`.
+- **Node pinned** by `.nvmrc` (24) and an `engines` field (>=20.19). CI reads
+  the `.nvmrc`.
+- **Reduced motion is no longer undiscoverable.** There is no JS motion config
+  left to toggle: the reduced-motion rules live in `site.css`, so previewing
+  them is a matter of the browser's own emulation rather than editing `App.jsx`.
 
 ## 7. Design polish
 
@@ -211,17 +253,29 @@ Minor, from looking at the rendered page:
   holds one email address.
 - `StampFrame` has a vestigial `border: color === 'paper' ? 'none' : 'none'`
   ([StampFrame.jsx:8](src/ds/StampFrame.jsx#L8)) — a ternary with identical branches.
-- `Reveal` accepts an `id` prop ([motion.jsx:5](src/components/motion.jsx#L5)) that no caller
-  passes.
+  It is a design-system copy, so the fix belongs in the package: editing the
+  copy here would fail `npm run sync:ds -- --check`. The component is unused on
+  the site either way (p58).
+- ~~`Reveal` accepts an `id` prop that no caller passes.~~ Gone with the
+  framer-motion rewrite.
 - `Badge` is exported from the design system and never used on the site.
 
 ---
 
 ## Suggested order
 
-1. Section 1 in full — half a day, and it is the difference between "demo" and "correct".
-2. Open-graph tags plus JSON-LD (section 3) — an hour, biggest visible return.
-3. `git init`, then CI on lint + build (section 6).
-4. Delete the dead assets and move framer-motion to `LazyMotion` (section 4).
-5. Take the contrast table to the brand owner before anything launches (section 2).
-6. Contact form and the remaining pages (section 5) — the actual next milestone.
+The engineering half of this list is done. What is left needs someone who can
+speak for the brand, in this order:
+
+1. **Choose the contact endpoint** and set `VITE_CONTACT_ENDPOINT`. Until it is
+   set, the form opens the visitor's mail client — working, but not captured.
+2. **Confirm the blue SKU's name**, and correct OBEIT → OBEAT in the print
+   files before they go to press.
+3. **Take the contrast table in §2 to the brand owner** — the darkened tints are
+   on the site already, but the decision should be theirs on the record.
+4. **Commission the photography** (§3 of BRAND-AUDIT). The brief is already
+   written on guidelines p43–p50.
+5. **Supply Zero30's back panel**, and a pack render whose face reads the real
+   500 g rather than 360 GMS.
+6. **Decide whether the site grows past one page** (§5). It is a structural
+   decision, and the copy for About / Product detail does not exist yet.

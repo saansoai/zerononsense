@@ -161,6 +161,9 @@ components that carried them.
 
 ### Still open
 
+Everything in this list is a brand or content decision. The engineering backlog
+that sat alongside it is closed — see [UPGRADES.md](UPGRADES.md) §6.
+
 - **Photography.** The hero runs two supplied photographic frames (retouched to
   lift their painted copy out — see the README). Below the hero the site still
   uses the pack artwork from the packaging deck. That satisfies "the product is
@@ -168,17 +171,24 @@ components that carried them.
   shoot the guidelines describe (p43–p50).
 - **Zero30 Daily** now has its front artwork (Mango Badaam) and a band of its
   own. Its back panel has not been supplied, so it carries front-of-pack figures
-  only and is named as missing under the label tabs.
-- **The blue SKU's name** is still unconfirmed.
-- **framer-motion is still 360 kB.** With the motion reduced to one fade, this is
-  now almost entirely unused weight — `LazyMotion` + `domAnimation`, or dropping
-  to an `IntersectionObserver` and a CSS class, would remove most of it.
-- **Mobile was not visually verified.** The browser window could not be resized
-  in this session, so the responsive rules (single-column stacks at 1000/860/520)
-  were reasoned through rather than seen. Worth a real device check.
-- **No contact form.** `#contact` is still a `mailto:`.
-- **Not a git repository**, no CI, no deploy config, no tests. See
-  [UPGRADES.md](UPGRADES.md) §6.
+  only and is named as missing under the label tabs. Its lineup render also
+  prints NET WT. 360GMS where the real pouch is 500 g; the card's spec line is
+  correct, so picture and text disagree until a corrected render exists.
+- **The blue SKU's name** is still unconfirmed. A test holds the
+  `nameNote` flag in place so filling the name in has to be a decision rather
+  than an edit.
+- **OBEIT → OBEAT** in the print files, before they go to press. The pack
+  images the site ships still carry the old spelling at small size.
+- **Mobile has still not been seen on a real device.** The responsive rules were
+  reasoned through, not watched. Nothing since has changed that; the contact
+  form's own breakpoints are likewise unverified.
+- **One page or several.** The brief lists Products, Product detail, About and
+  Contact. There is still no router, and the copy for the other pages does not
+  exist — so this is a content decision before it is a technical one.
+
+Closed since this audit: framer-motion (the bundle is 251 kB now, almost all of
+it React), the contact form, version control, CI, tests, deploy config, a 404
+page and analytics.
 
 ### The original recommendation, for reference
 

@@ -6,10 +6,41 @@ artwork in `../../ZN/`.
 
 ```bash
 npm install
-npm run dev     # http://localhost:5173
-npm run build   # production bundle in dist/
+cp .env.example .env.local   # optional; both variables may stay empty
+
+npm run dev        # http://localhost:5173
+npm run build      # production bundle in dist/
+npm run preview    # serve that bundle
+
 npm run lint
+npm test           # vitest, once
+npm run test:watch
+npm run sync:ds    # re-copy the design system (see below)
 ```
+
+Node 24 (`.nvmrc`); anything from 20.19 works. CI runs lint, the design-system
+sync check, the tests and the build on every push.
+
+### Environment
+
+Both variables are optional and neither is a secret — Vite inlines every
+`VITE_*` value into the client bundle, so nothing that needs protecting may go
+in them. `.env.example` is the template.
+
+| Variable | Effect when unset |
+| --- | --- |
+| `VITE_CONTACT_ENDPOINT` | The contact form hands off to the visitor's mail client instead of POSTing. |
+| `VITE_ANALYTICS_DOMAIN` | No analytics script is loaded at all. |
+| `BASE_PATH` (build only) | Assets are served from the domain root. Set it to deploy under a subpath. |
+
+### Deploying
+
+`netlify.toml` sits at the repository root with `base = "website"`.
+`vercel.json` sits here; on Vercel set the project's Root Directory to
+`website`. Both set long immutable caching on the fingerprinted `assets/`,
+a week on the pack artwork, and no-cache on HTML. A Content-Security-Policy is
+written out in `netlify.toml` as a comment rather than set, because `connect-src`
+cannot be completed until the contact endpoint is chosen — finish it then.
 
 ## The organising idea: the open file
 
@@ -197,8 +228,33 @@ across that wall and a global cut takes it as ink.
 - `StampFrame`, `RubberStamp` and `Badge` are unused: all three were being used
   decoratively, which p58 rules out.
 
-When the package changes, re-copy `src/styles/` and `src/ds/` rather than editing
-them here — but keep the `#222222` correction.
+## Keeping the design system in sync
+
+`src/styles/` and `src/ds/` are copies of the package in
+`../Zero Nonsense Design System/`, which ships no `package.json` and so cannot
+be imported. Do not edit the copies. Run `npm run sync:ds` instead: it rewrites
+them from the package and reapplies the two divergences recorded in
+`scripts/sync-ds.mjs` (Zero Black `#222222` over the package's `#1E1C18`, and
+dropping the font `@import` that would duplicate what index.html already
+preconnects). `npm run sync:ds -- --check` is what CI runs, and it fails on
+drift.
+
+If a patch's anchor text has disappeared from the package, the script stops
+with an error rather than skipping it — that is the case where the package
+changed exactly where the site overrides it, and someone has to decide what the
+override should be now.
+
+## Tests
+
+`src/__tests__/` holds twelve tests, aimed at the brand rules above rather than
+at coverage: the forbidden band adjacencies, one `h1`, a resolving skip link,
+an alt on every image, every in-page anchor landing on a real id, the reveal
+content present without an IntersectionObserver, and all four of the contact
+form's submit paths.
+
+`vitest.setup.js` stubs `matchMedia`, which jsdom lacks and every browser has.
+It deliberately does **not** stub `IntersectionObserver`: `Nav` and `Reveal`
+both have to work without one, and leaving it missing keeps that path tested.
 
 ## Still needed from the brand
 
@@ -224,5 +280,11 @@ them here — but keep the `#222222` correction.
 - **Sign-off on "Clinically Proven For Health Support"** — it is printed on the
   carton and reproduced in the pack image, but the site does not repeat it as a
   claim in its own copy.
-- A contact form. `#contact` is still a mailto.
-- The rest of the sitemap: Products, Product detail, About, Contact.
+- **An endpoint for the contact form.** `#contact` is a real form now, but with
+  no `VITE_CONTACT_ENDPOINT` set it hands the enquiry to the visitor's own mail
+  client rather than capturing it. Any service that accepts a JSON POST will do.
+- **A decision on the rest of the sitemap**: Products, Product detail, About,
+  Contact. There is no router, and the copy for those pages does not exist.
+- **A corrected Zero30 lineup render.** The one on the page reads NET WT.
+  360GMS; the pouch is 500 g, and the spec line beside it says so.
+- **OBEIT → OBEAT in the print files**, before they go to press.
