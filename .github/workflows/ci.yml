@@ -25,6 +25,13 @@ jobs:
 
       - run: npm ci
 
+      # Blocking at high. Vite's dev-server advisories of 2026-10-21 reached
+      # the live host's scanner before they reached anyone here, which is the
+      # thing this step is for. Most advisories that land will be dev-only and
+      # will not affect the built site, but the fix is usually one command.
+      - name: Audit
+        run: npm audit --audit-level=high
+
       - name: Lint
         run: npm run lint
 
