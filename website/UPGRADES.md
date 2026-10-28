@@ -202,8 +202,12 @@ decided, because several of the decisions are not obvious from the files.
   the design-system package together — the sync check below only means something
   if both are in the same history. `.gitattributes` normalises line endings so a
   Windows checkout does not rewrite every file.
-- **Deployment.** `netlify.toml` at the root (`base = "website"`) and
-  `website/vercel.json`. Both set immutable caching on the fingerprinted
+- **Deployment.** Hostinger is the live host: `website/public/.htaccess`
+  carries the rules there (it is copied into `dist/` by the build, so it lands
+  at the root of `public_html`), and `.github/workflows/deploy.yml` builds and
+  publishes `website/dist` to a `deploy` branch, because Hostinger's Git
+  integration serves a branch without building it. `netlify.toml` at the root
+  (`base = "website"`) and `website/vercel.json` cover the other two. Both set immutable caching on the fingerprinted
   `assets/`, a week on pack artwork and hero frames, and no-cache on HTML, plus
   `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and
   `Permissions-Policy`. A CSP is written out as a comment rather than set,

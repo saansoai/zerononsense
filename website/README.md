@@ -35,12 +35,51 @@ in them. `.env.example` is the template.
 
 ### Deploying
 
-`netlify.toml` sits at the repository root with `base = "website"`.
-`vercel.json` sits here; on Vercel set the project's Root Directory to
-`website`. Both set long immutable caching on the fingerprinted `assets/`,
-a week on the pack artwork, and no-cache on HTML. A Content-Security-Policy is
-written out in `netlify.toml` as a comment rather than set, because `connect-src`
-cannot be completed until the contact endpoint is chosen — finish it then.
+Three platforms are configured, and **their rules have to be changed
+together** — caching, security headers and the 404 are written three times
+because no one platform reads another's config:
+
+| Platform | File | Notes |
+| --- | --- | --- |
+| Hostinger | `website/public/.htaccess` | Copied into `dist/` by the build, so it lands at the root of `public_html`. |
+| Netlify | `netlify.toml` (repo root) | `base = "website"`. |
+| Vercel | `website/vercel.json` | Set the project's Root Directory to `website`. |
+
+All three set long immutable caching on the fingerprinted `assets/`, a week on
+the pack artwork, and no-cache on HTML. A Content-Security-Policy is written
+out as a comment rather than set, because `connect-src` cannot be completed
+until the contact endpoint is chosen — finish it in `.htaccess` and
+`netlify.toml` together when it is.
+
+#### Hostinger (the live host)
+
+Hostinger's Git integration **pulls a branch and serves it — it does not run a
+build**. So `.github/workflows/deploy.yml` does the building: on every push to
+`main` it lints, tests, builds, and publishes the contents of `website/dist` to
+a branch called `deploy`. Hostinger watches `deploy`.
+
+In hPanel: the site's dashboard → Advanced → Git → Connect with GitHub, then
+pick this repository, the **`deploy`** branch, and the root deploy directory
+(`public_html`). Once connected, every push to `deploy` deploys automatically.
+The Deployments tab shows the history, and Redeploy pulls on demand.
+
+Three things to know:
+
+- `public_html` must be **empty** before the first connect, or the deployment
+  fails. Clear out any default `index.html` or `default.php` first.
+- The branch keeps its history rather than being force-pushed, so Hostinger's
+  pull can never land on a rewritten head.
+- Set `VITE_CONTACT_ENDPOINT` as an Actions **secret** and
+  `VITE_ANALYTICS_DOMAIN` as an Actions **variable** in the repository
+  settings. Vite inlines both into the client bundle, so neither is secret in
+  any real sense — they live in Actions to keep the values out of the
+  repository, not to hide them. Both may be left unset.
+
+`index.html` declares `https://zerononsense.com/` as its canonical URL, and
+`public/sitemap.xml` and `public/robots.txt` name the same host. While the site
+is on a temporary Hostinger domain those three point at an address that is not
+serving it; they are correct the moment the real domain is attached, so change
+them only if the final host differs.
 
 ## The organising idea: the open file
 

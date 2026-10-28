@@ -1,0 +1,91 @@
+name: Deploy
+
+# Hostinger's Git integration does not run a build — it pulls a branch and
+# serves whatever files are in it. So this builds the site and publishes the
+# contents of website/dist to the `deploy` branch, which is what Hostinger is
+# pointed at. Pushing to main deploys; nothing is uploaded by hand.
+#
+# The branch keeps its history rather than being force-pushed, so Hostinger's
+# pull can never hit a rewritten head.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: website/.nvmrc
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - run: npm ci
+        working-directory: website
+
+      # A broken build must not reach public_html, so the same gates CI runs
+      # run here before anything is published.
+      - name: Lint
+        working-directory: website
+        run: npm run lint
+
+      - name: Test
+        working-directory: website
+        run: npm test
+
+      - name: Build
+        working-directory: website
+        # Both are inlined into the client bundle by Vite, so neither is a
+        # secret in any real sense — they live in Actions only to keep the
+        # values out of the repository. Unset is a valid state for both: the
+        # form falls back to the visitor's mail client and no analytics script
+        # is loaded.
+        env:
+          VITE_CONTACT_ENDPOINT: ${{ secrets.VITE_CONTACT_ENDPOINT }}
+          VITE_ANALYTICS_DOMAIN: ${{ vars.VITE_ANALYTICS_DOMAIN }}
+        run: npm run build
+
+      - name: Publish dist to the deploy branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          out="$RUNNER_TEMP/deploy"
+
+          if git ls-remote --exit-code --heads "$remote" deploy >/dev/null 2>&1; then
+            git clone --branch deploy --single-branch --depth 1 "$remote" "$out"
+          else
+            git clone --depth 1 "$remote" "$out"
+            git -C "$out" checkout --orphan deploy
+          fi
+
+          # Everything but .git goes, so a file deleted from the build is
+          # deleted from the branch — and therefore from public_html.
+          find "$out" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+
+          # The trailing /. copies dotfiles too, which is how .htaccess gets in.
+          cp -a website/dist/. "$out/"
+
+          cd "$out"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -f
+          if git diff --cached --quiet; then
+            echo "Build is identical to the deployed branch; nothing to publish."
+            exit 0
+          fi
+          git commit -q -m "Build ${GITHUB_SHA::7}"
+          git push -q "$remote" deploy

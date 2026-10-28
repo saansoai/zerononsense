@@ -1,0 +1,78 @@
+# Zero Nonsense — Apache / LiteSpeed rules for Hostinger shared hosting.
+#
+# This file is in public/, so Vite copies it into dist/ on every build and it
+# lands at the root of public_html. It carries the same rules netlify.toml and
+# vercel.json set on those platforms — neither of those files does anything on
+# Hostinger, and all three have to be changed together.
+
+Options -Indexes
+DirectoryIndex index.html
+
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS. The second condition is for the proxy in front of LiteSpeed,
+  # which terminates TLS and passes the original scheme in a header.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Pick ONE canonical host and uncomment it, so the site is not served from
+  # two addresses. index.html's <link rel="canonical"> says zerononsense.com
+  # with no www, so that is the first block.
+
+  # www -> apex  (https://zerononsense.com)
+  # RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  # RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+  # apex -> www  (https://www.zerononsense.com)
+  # RewriteCond %{HTTP_HOST} !^www\. [NC]
+  # RewriteCond %{HTTP_HOST} !^localhost [NC]
+  # RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Vite fingerprints everything under /assets/, so those filenames change
+# whenever their contents do and may be cached forever. Nothing else may be:
+# index.html has to be re-fetched or a deploy never reaches anyone.
+<IfModule mod_setenvif.c>
+  SetEnvIf Request_URI "^/assets/" ZN_IMMUTABLE
+  SetEnvIf Request_URI "^/(packs|hero|bg)/" ZN_ARTWORK
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set Cache-Control "public, max-age=31536000, immutable" env=ZN_IMMUTABLE
+  Header set Cache-Control "public, max-age=604800" env=ZN_ARTWORK
+
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+  # A Content-Security-Policy is deliberately not set. The contact form POSTs
+  # to whatever VITE_CONTACT_ENDPOINT names, so connect-src cannot be written
+  # until that endpoint is chosen. Once it is, uncomment and fill in the last
+  # origin — and make the same change in netlify.toml.
+  #
+  # Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://plausible.io YOUR_FORM_ENDPOINT_ORIGIN; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/xml image/svg+xml
+</IfModule>
+
+# Served correctly by default on LiteSpeed, declared here so a move to plain
+# Apache does not quietly start handing these back as octet-stream.
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType image/avif .avif
+  AddType image/svg+xml .svg
+  AddType font/woff2 .woff2
+</IfModule>
