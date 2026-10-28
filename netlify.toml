@@ -41,8 +41,7 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-Frame-Options = "SAMEORIGIN"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
-    # A Content-Security-Policy is deliberately not set here. The form POSTs to
-    # whatever VITE_CONTACT_ENDPOINT names, so connect-src cannot be written
-    # until that endpoint is chosen. Once it is, add:
-    #
-    #   Content-Security-Policy = "default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://plausible.io <your form endpoint origin>; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+    # The form posts to /contact.php on the same origin, so connect-src
+    # needs nothing but 'self' and Plausible. Keep this in step with
+    # website/public/.htaccess and website/vercel.json.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://plausible.io; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"

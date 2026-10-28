@@ -35,51 +35,58 @@ in them. `.env.example` is the template.
 
 ### Deploying
 
-Three platforms are configured, and **their rules have to be changed
-together** — caching, security headers and the 404 are written three times
-because no one platform reads another's config:
+The site is **zerononsense.in**, hosted on Hostinger, built by Hostinger's own
+Node deployment. Push to `main` and it rebuilds.
+
+In hPanel the settings are: framework preset **Vite**, branch **`main`**, root
+directory **`website`**, build and output left at the Vite defaults
+(`npm run build` → `dist`), and Node **22.x or newer** — Vite 8 requires
+`^20.19.0 || >=22.12.0`, so an older 20.x fails outright.
+
+Two environment variables are set there:
+
+| Key | Value |
+| --- | --- |
+| `VITE_CONTACT_ENDPOINT` | `/contact.php` |
+| `VITE_ANALYTICS_DOMAIN` | `zerononsense.in` |
+
+Neither is a secret — Vite inlines both into the client bundle. Both may be
+left unset, and the site still works: the form falls back to the visitor's mail
+client and no analytics script loads.
+
+#### The contact endpoint
+
+`public/contact.php` is the form's backend. It is copied into `dist/` by the
+build, so it is served at `/contact.php` on the same origin as the page —
+which is why the Content-Security-Policy can keep `connect-src` at `'self'`.
+It validates, rejects line breaks in anything that reaches a mail header,
+answers the honeypot with a 200 so a bot cannot tell, throttles to one send
+per IP per 20 seconds, and mails `info@zerononsense.in` with the visitor's
+address in `Reply-To`.
+
+The `From:` address is `website@zerononsense.in` and has to stay on this
+domain, or SPF and DKIM will not vouch for the mail and it lands in spam.
+
+There is no PHP in `vite dev`, so locally the form keeps its mail-client
+fallback. **Netlify and Vercel do not run PHP either** — deploying there means
+porting this to a function first.
+
+#### Platform rules are written three times
+
+Caching, security headers and the 404 have to be changed in step; no platform
+reads another's config:
 
 | Platform | File | Notes |
 | --- | --- | --- |
-| Hostinger | `website/public/.htaccess` | Copied into `dist/` by the build, so it lands at the root of `public_html`. |
+| Hostinger | `public/.htaccess` | Copied into `dist/`, lands at the root of `public_html`. |
 | Netlify | `netlify.toml` (repo root) | `base = "website"`. |
-| Vercel | `website/vercel.json` | Set the project's Root Directory to `website`. |
+| Vercel | `vercel.json` | Set the project's Root Directory to `website`. |
 
-All three set long immutable caching on the fingerprinted `assets/`, a week on
-the pack artwork, and no-cache on HTML. A Content-Security-Policy is written
-out as a comment rather than set, because `connect-src` cannot be completed
-until the contact endpoint is chosen — finish it in `.htaccess` and
-`netlify.toml` together when it is.
-
-#### Hostinger (the live host)
-
-Hostinger's Git integration **pulls a branch and serves it — it does not run a
-build**. So `.github/workflows/deploy.yml` does the building: on every push to
-`main` it lints, tests, builds, and publishes the contents of `website/dist` to
-a branch called `deploy`. Hostinger watches `deploy`.
-
-In hPanel: the site's dashboard → Advanced → Git → Connect with GitHub, then
-pick this repository, the **`deploy`** branch, and the root deploy directory
-(`public_html`). Once connected, every push to `deploy` deploys automatically.
-The Deployments tab shows the history, and Redeploy pulls on demand.
-
-Three things to know:
-
-- `public_html` must be **empty** before the first connect, or the deployment
-  fails. Clear out any default `index.html` or `default.php` first.
-- The branch keeps its history rather than being force-pushed, so Hostinger's
-  pull can never land on a rewritten head.
-- Set `VITE_CONTACT_ENDPOINT` as an Actions **secret** and
-  `VITE_ANALYTICS_DOMAIN` as an Actions **variable** in the repository
-  settings. Vite inlines both into the client bundle, so neither is secret in
-  any real sense — they live in Actions to keep the values out of the
-  repository, not to hide them. Both may be left unset.
-
-`index.html` declares `https://zerononsense.com/` as its canonical URL, and
-`public/sitemap.xml` and `public/robots.txt` name the same host. While the site
-is on a temporary Hostinger domain those three point at an address that is not
-serving it; they are correct the moment the real domain is attached, so change
-them only if the final host differs.
+All three set immutable caching on the fingerprinted `assets/`, a week on the
+pack artwork, no-cache on HTML, four security headers and the same
+Content-Security-Policy. `.htaccess` additionally forces HTTPS and redirects
+`www` to the apex, which is what `index.html`'s canonical, `sitemap.xml` and
+`robots.txt` all name.
 
 ## The organising idea: the open file
 
@@ -319,9 +326,11 @@ both have to work without one, and leaving it missing keeps that path tested.
 - **Sign-off on "Clinically Proven For Health Support"** — it is printed on the
   carton and reproduced in the pack image, but the site does not repeat it as a
   claim in its own copy.
-- **An endpoint for the contact form.** `#contact` is a real form now, but with
-  no `VITE_CONTACT_ENDPOINT` set it hands the enquiry to the visitor's own mail
-  client rather than capturing it. Any service that accepts a JSON POST will do.
+- **Confirmation that form mail arrives.** `public/contact.php` mails
+  `info@zerononsense.in` from `website@zerononsense.in`. Send one real enquiry
+  through the live site and check it is not filtered as spam — that depends on
+  the domain's SPF and DKIM records, which are a DNS matter rather than a code
+  one.
 - **A decision on the rest of the sitemap**: Products, Product detail, About,
   Contact. There is no router, and the copy for those pages does not exist.
 - **A corrected Zero30 lineup render.** The one on the page reads NET WT.

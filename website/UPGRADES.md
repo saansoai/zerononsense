@@ -202,12 +202,13 @@ decided, because several of the decisions are not obvious from the files.
   the design-system package together — the sync check below only means something
   if both are in the same history. `.gitattributes` normalises line endings so a
   Windows checkout does not rewrite every file.
-- **Deployment.** Hostinger is the live host: `website/public/.htaccess`
-  carries the rules there (it is copied into `dist/` by the build, so it lands
-  at the root of `public_html`), and `.github/workflows/deploy.yml` builds and
-  publishes `website/dist` to a `deploy` branch, because Hostinger's Git
-  integration serves a branch without building it. `netlify.toml` at the root
-  (`base = "website"`) and `website/vercel.json` cover the other two. Both set immutable caching on the fingerprinted
+- **Deployment.** The live host is Hostinger, at zerononsense.in, building
+  from `main` with its own Node deployment (framework preset Vite, root
+  directory `website`). `website/public/.htaccess` carries the platform rules
+  there; `netlify.toml` at the root (`base = "website"`) and
+  `website/vercel.json` cover the other two, and all three now set the same
+  Content-Security-Policy — possible because the form posts to
+  `/contact.php` on the same origin. Both set immutable caching on the fingerprinted
   `assets/`, a week on pack artwork and hero frames, and no-cache on HTML, plus
   `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and
   `Permissions-Policy`. A CSP is written out as a comment rather than set,
@@ -271,8 +272,10 @@ Minor, from looking at the rendered page:
 The engineering half of this list is done. What is left needs someone who can
 speak for the brand, in this order:
 
-1. **Choose the contact endpoint** and set `VITE_CONTACT_ENDPOINT`. Until it is
-   set, the form opens the visitor's mail client — working, but not captured.
+1. ~~Choose the contact endpoint.~~ **Done** — `public/contact.php` mails
+   `info@zerononsense.in`, and `VITE_CONTACT_ENDPOINT=/contact.php` is set in
+   Hostinger. Send one real enquiry through the live site to confirm the mail
+   arrives and is not filtered.
 2. **Confirm the blue SKU's name**, and correct OBEIT → OBEAT in the print
    files before they go to press.
 3. **Take the contrast table in §2 to the brand owner** — the darkened tints are
