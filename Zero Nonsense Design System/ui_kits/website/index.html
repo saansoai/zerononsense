@@ -1,0 +1,156 @@
+<!-- @dsCard group="Website" viewport="1440x900" name="Homepage" subtitle="Premium transparent site over cloudy sky" -->
+<!-- @startingPoint section="Website" subtitle="Glass marketing homepage over sky" viewport="1440x900" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Zero Nonsense</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+html,body{margin:0;background:var(--sky-gradient);color:var(--zn-archival-paper);font-family:var(--font-mono)}
+a{color:var(--zn-archival-paper);text-decoration:none}a:hover{color:var(--text-link-hover)}
+::selection{background:var(--zn-verification-stamp);color:var(--zn-archival-paper)}
+</style></head><body><div id="root"></div>
+<script type="text/babel">
+const { Button, Input, Tabs, Card, Badge, Tag, Dialog, Toast, RubberStamp, StampFrame, Tooltip } = new Proxy({}, { get: (_, k) => function Late(props){ const C = (window.ZeroNonsenseDesignSystem_e3dd65||{})[k]; return C ? React.createElement(C, props) : null; } });
+const A = 'var(--zn-archival-paper)', RED = 'var(--zn-verification-stamp)', BLUE = 'var(--zn-blueprint-ink)', INK = 'var(--zn-ink-black)';
+const glass = { background: 'var(--glass-bg)', backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))', border: '1px solid var(--glass-border)' };
+const mono = (s, extra) => ({ fontFamily: 'var(--font-mono)', fontSize: s, letterSpacing: '0.1em', textTransform: 'uppercase', ...extra });
+
+const RANGES = {
+  adult: { name: 'Adult', color: BLUE, headline: 'Daily Support for Blood Sugar & Metabolic Wellness', sub: 'Helps manage HbA1c levels', img: '../../extract/packaging-p03.jpg', price: '₹699', badge: '14 sachets', bullets: ['100% Natural Ingredients', 'Rich in Omega-3 Fatty Acids', 'No Artificial Sweeteners'] },
+  obeit: { name: 'OBEIT', color: RED, headline: 'Daily Nutrition Support for Calorie Conscious Living', sub: 'Helps manage hunger', img: '../../extract/packaging-p07.jpg', price: '₹699', badge: '14 sachets', bullets: ['Controls hunger pangs', 'Nutrient-dense formula', 'No Added Colours'] },
+  kids: { name: 'Kids', color: BLUE, headline: 'Zero Secrets — Honest Nutrition for Growing Kids', sub: 'Everything on the label', img: '../../extract/packaging-p05.jpg', price: '₹649', badge: '14 sachets', bullets: ['100% Natural Ingredients', 'No Preservatives', 'Gut-friendly formula'] },
+};
+
+function Nav({ onBag }) {
+  return (
+    <nav style={{ position: 'fixed', top: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 100, width: 'min(1200px, calc(100vw - 48px))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', borderRadius: 'var(--radius-pill)', boxShadow: 'var(--shadow-glass)', ...glass }}>
+      <img src="../../assets/logo-stamp.png" alt="ZN" style={{ height: 40 }} />
+      <div style={{ display: 'flex', gap: 28, ...mono('12px', { letterSpacing: '0.08em' }) }}>
+        <a href="#range">The Range</a><a href="#promise">Zero Nonsense Promise</a><a href="#contact">Contact</a>
+      </div>
+      <Button variant="glass" size="sm" onClick={onBag}>Bag (0)</Button>
+    </nav>
+  );
+}
+
+function Hero() {
+  return (
+    <header style={{ minHeight: '92vh', display: 'grid', placeItems: 'center', position: 'relative', overflow: 'hidden' }}>
+      <img src="../../assets/sky-clouds-tall.jpg" alt="" style={{ position: 'absolute', left: 0, bottom: 0, height: '70%', opacity: 0.9, maskImage: 'linear-gradient(to right,#000 40%,transparent)', WebkitMaskImage: 'linear-gradient(to right,#000 40%,transparent)' }} />
+      <img src="../../assets/sky-clouds-wide.jpg" alt="" style={{ position: 'absolute', right: 0, bottom: '-2%', width: '75%', opacity: 0.85, maskImage: 'linear-gradient(to left,#000 30%,transparent 80%)', WebkitMaskImage: 'linear-gradient(to left,#000 30%,transparent 80%)' }} />
+      <div style={{ textAlign: 'center', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28, padding: '120px 24px 60px' }}>
+        <div style={mono('12px', { color: A, opacity: 0.9 })}>Nutrition · Zero Secrets · Zero Shortcuts</div>
+        <img src="../../assets/wordmark-adult.png" alt="Zero Nonsense" style={{ width: 'min(560px, 80vw)' }} />
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 15, lineHeight: 1.5, maxWidth: 520, margin: 0 }}>Millet-based daily nutrition with every ingredient on the label. No artificial sweeteners. No added colours. No preservatives. No nonsense.</p>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <Button size="lg" onClick={() => { location.hash = '#range'; }}>Shop the range</Button>
+          <Button variant="glass" size="lg" onClick={() => { location.hash = '#promise'; }}>Our promise</Button>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 14, background: 'var(--airmail-stripe)' }}></div>
+    </header>
+  );
+}
+
+function Range({ onAdd }) {
+  const [r, setR] = React.useState('adult');
+  const d = RANGES[r];
+  return (
+    <section id="range" style={{ padding: '72px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
+      <div style={mono('13px', { color: A })}>The Range</div>
+      <Tabs glass items={[{ value: 'adult', label: 'Adult' }, { value: 'kids', label: 'Kids' }, { value: 'obeit', label: 'OBEIT' }]} value={r} onChange={setR} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px,520px) minmax(280px,420px)', gap: 24, alignItems: 'stretch', flexWrap: 'wrap', maxWidth: 1000 }}>
+        <div style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--glass-border)', boxShadow: 'var(--shadow-glass)', minHeight: 340, background: `url(${d.img}) center/cover` }}></div>
+        <Card variant="glass" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', gap: 8 }}><Badge color={d.color === RED ? 'red' : 'blue'}>{d.badge}</Badge><Badge color="paper">{d.sub}</Badge></div>
+          <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontWeight: 700, fontSize: 30, lineHeight: 1.08, letterSpacing: '-0.02em' }}>{d.headline}</h2>
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.3 }}>
+            {d.bullets.map(b => <li key={b}><span style={{ color: A, fontFamily: 'var(--font-serif)', fontWeight: 700 }}>*</span> {b}</li>)}
+          </ul>
+          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
+            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 700 }}>{d.price}</span>
+            <Button onClick={() => onAdd(d)}>Add to bag</Button>
+          </div>
+        </Card>
+      </div>
+    </section>
+  );
+}
+
+function Promise() {
+  const items = [
+    ['100% Ingredient Transparency', 'Every gram on the label — millets, pulses, nuts & seeds, nothing hidden.'],
+    ['Clinically Proven For Health', 'Formulated and tested to support real, measurable outcomes.'],
+    ['Zero Additives', 'No artificial sweeteners, no added colours, no preservatives.'],
+  ];
+  return (
+    <section id="promise" style={{ padding: '72px 24px 96px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
+      <RubberStamp size={130} color="paper" text="100% Ingredient Transparency • " />
+      <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontWeight: 700, fontSize: 44, lineHeight: 1.05, letterSpacing: '-0.02em', textAlign: 'center', maxWidth: 640 }}>The Zero Nonsense Promise</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,300px))', gap: 18, justifyContent: 'center' }}>
+        {items.map(([t, b]) => (
+          <Card key={t} variant="glass" style={{ padding: 20 }}>
+            <div style={mono('11px', { color: A, marginBottom: 10 })}>{t}</div>
+            <div style={{ fontSize: 13, lineHeight: 1.45 }}>{b}</div>
+          </Card>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer id="contact" style={{ marginTop: 24 }}>
+      <div style={{ height: 14, background: 'var(--airmail-stripe)' }}></div>
+      <div style={{ background: 'rgba(30,28,24,0.35)', backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))', padding: '48px 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 32, maxWidth: '100%', alignItems: 'start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <img src="../../assets/wordmark-stacked.png" alt="Zero Nonsense" style={{ width: 150 }} />
+          <div style={{ fontSize: 11, lineHeight: 1.5, opacity: 0.85 }}>Saanso Nutri Sciences Pvt. Ltd.<br />Hyderabad, Telangana</div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, ...mono('11px') }}>
+          <span style={{ opacity: 0.6 }}>Shop</span><a href="#range">Adult</a><a href="#range">Kids</a><a href="#range">OBEIT</a>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, ...mono('11px') }}>
+          <span style={{ opacity: 0.6 }}>Company</span><a href="#promise">Our promise</a><a href="#contact">Contact</a><a href="#contact">FAQ</a>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={mono('11px', { opacity: 0.6 })}>Stay honest with us</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Input glass placeholder="you@example.com" style={{ flex: 1 }} />
+            <Button variant="primary">Join</Button>
+          </div>
+          <div style={{ fontSize: 11, opacity: 0.85 }}>info@saansonutri.com</div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  const [dlg, setDlg] = React.useState(null);
+  const [toast, setToast] = React.useState(null);
+  const add = d => { setDlg(d); };
+  const confirm = () => { setToast(`Added to bag — ${dlg.name} · ${dlg.badge}`); setDlg(null); setTimeout(() => setToast(null), 3500); };
+  return (
+    <div>
+      <Nav onBag={() => setToast('Your bag is empty — zero items, zero nonsense.') || setTimeout(() => setToast(null), 3000)} />
+      <Hero />
+      <Range onAdd={add} />
+      <Promise />
+      <Footer />
+      <Dialog glass open={!!dlg} onClose={() => setDlg(null)} title={dlg ? dlg.headline : ''}
+        footer={<React.Fragment><Button variant="ghost" onClick={() => setDlg(null)}>Keep shopping</Button><Button onClick={confirm}>Add · {dlg && dlg.price}</Button></React.Fragment>}>
+        {dlg && <span>{dlg.badge} · {dlg.sub}</span>}
+      </Dialog>
+      {toast && <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 200 }}><Toast tone="ink">{toast}</Toast></div>}
+    </div>
+  );
+}
+function __mount(tries){ if(!window.ZeroNonsenseDesignSystem_e3dd65){ if(tries>0) return setTimeout(()=>__mount(tries-1),150); document.getElementById('root').innerHTML='<p style="font-family:monospace;padding:20px">Design-system bundle not compiled yet — reload this page.</p>'; return; } __render(); }
+__mount(30);
+function __render(){ ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+}
+</script></body></html>

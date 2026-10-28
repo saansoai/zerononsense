@@ -1,0 +1,34 @@
+<!-- @dsCard group="Components" viewport="700x360" name="Overlay & Navigation" subtitle="Tabs, Dialog, Toast, Tooltip" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--zn-archival-paper);padding:20px}a{color:var(--text-link)}a:hover{color:var(--text-link-hover)}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Tabs, Dialog, Toast, Tooltip, Button, Badge } = new Proxy({}, { get: (_, k) => function Late(props){ const C = (window.ZeroNonsenseDesignSystem_e3dd65||{})[k]; return C ? React.createElement(C, props) : null; } });
+function Demo(){
+  const [open,setOpen]=React.useState(false);
+  return <div style={{display:'flex',flexDirection:'column',gap:18}}>
+    <Tabs items={[{value:'adult',label:'Adult'},{value:'kids',label:'Kids'},{value:'obeit',label:'OBEIT'}]} defaultValue="adult" />
+    <div style={{display:'flex',gap:12,alignItems:'center'}}>
+      <Button variant="outline" onClick={()=>setOpen(true)}>Open dialog</Button>
+      <Tooltip label="Zero preservatives, promise"><Badge color="ink">Hover me</Badge></Tooltip>
+    </div>
+    <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+      <Toast tone="ink" onDismiss={()=>{}}>Added to bag — 14 sachets</Toast>
+      <Toast tone="red">Only 3 left in stock</Toast>
+      <Toast tone="blue">Order shipped</Toast>
+    </div>
+    <Dialog open={open} onClose={()=>setOpen(false)} title="Added to bag"
+      footer={<><Button variant="ghost" onClick={()=>setOpen(false)}>Keep shopping</Button><Button onClick={()=>setOpen(false)}>Checkout</Button></>}>
+      Daily Support for Blood Sugar & Metabolic Wellness · 14 sachets · ₹699
+    </Dialog>
+  </div>;
+}
+function __mount(tries){ if(!window.ZeroNonsenseDesignSystem_e3dd65){ if(tries>0) return setTimeout(()=>__mount(tries-1),150); document.getElementById('root').innerHTML='<p style="font-family:monospace;padding:20px">Design-system bundle not compiled yet — reload this page.</p>'; return; } __render(); }
+__mount(30);
+function __render(){ ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+}
+</script></body></html>

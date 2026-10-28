@@ -1,0 +1,21 @@
+:root{
+--font-serif:'Averia Serif Libre',Georgia,serif; /* Primary typeface — headings */
+--font-mono:'Geist Mono','IBM Plex Mono',monospace; /* Secondary typeface — everything else */
+/* Scale */
+--text-display:clamp(44px,6vw,84px);
+--text-h1:48px;
+--text-h2:34px;
+--text-h3:24px;
+--text-sub:15px; /* mono sub-heading, letterspaced */
+--text-body-size:15px;
+--text-annotation:12px;
+--text-cta:14px;
+/* Rules from brand type hierarchy */
+--leading-heading:1.05; /* 90–165% range, tight default */
+--leading-body:1.2;    /* 120% */
+--kerning-heading:-0.02em;
+--kerning-sub:0.1em;   /* 10% */
+--kerning-cta:0.02em;
+--weight-heading:700;
+--weight-cta:500;
+}

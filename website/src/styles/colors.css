@@ -1,0 +1,37 @@
+:root{
+/* Primary palette — named per brand guidelines */
+--zn-archival-paper:#F3F1E4;
+--zn-verification-stamp:#E9461E;
+--zn-blueprint-ink:#5E97DF;
+/* Support colors sampled from packaging/logo */
+--zn-asterisk-maroon:#7E2E1B;
+--zn-ink-black:#222222; /* Zero Black, per guidelines p34 (was #1E1C18) */
+--zn-paper-warm:#F2EFE2;
+/* Tints & shades */
+--zn-blue-deep:#3F76BE;
+--zn-blue-sky-light:#7FAEE8;
+--zn-red-deep:#C23517;
+--zn-paper-shade:#E6E2D0;
+/* Semantic aliases */
+--surface-page:var(--zn-archival-paper);
+--surface-card:var(--zn-archival-paper);
+--surface-accent:var(--zn-blueprint-ink);
+--surface-alert:var(--zn-verification-stamp);
+--text-body:var(--zn-ink-black);
+--text-heading:var(--zn-ink-black);
+--text-on-blue:var(--zn-archival-paper);
+--text-on-red:var(--zn-archival-paper);
+--text-accent:var(--zn-verification-stamp);
+--text-link:var(--zn-blue-deep);
+--text-link-hover:var(--zn-verification-stamp);
+--border-strong:var(--zn-ink-black);
+--border-accent:var(--zn-verification-stamp);
+--focus-ring:var(--zn-blueprint-ink);
+/* Glass / transparency system (premium transparent website) */
+--glass-bg:rgba(243,241,228,0.14);
+--glass-bg-strong:rgba(243,241,228,0.55);
+--glass-border:rgba(243,241,228,0.45);
+--glass-blur:14px;
+--glass-blur-strong:24px;
+--sky-gradient:linear-gradient(180deg,#7FAEE8 0%,#5E97DF 55%,#4E86CF 100%); /* @kind other */
+}

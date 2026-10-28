@@ -1,0 +1,35 @@
+<!-- @dsCard group="Components" viewport="700x400" name="Display" subtitle="Card, Badge, Tag, StampFrame, RubberStamp" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--zn-archival-paper);padding:20px}a{color:var(--text-link)}a:hover{color:var(--text-link-hover)}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Card, Badge, Tag, StampFrame, RubberStamp } = new Proxy({}, { get: (_, k) => function Late(props){ const C = (window.ZeroNonsenseDesignSystem_e3dd65||{})[k]; return C ? React.createElement(C, props) : null; } });
+function Demo(){
+  const [f,setF]=React.useState('adult');
+  return <div style={{display:'flex',flexDirection:'column',gap:16}}>
+    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
+      <Card variant="paper" dashed style={{padding:16}}><b style={{fontFamily:'var(--font-serif)'}}>Ingredients:</b><br/>Millets & cereals 46%, pulses 15%…</Card>
+      <Card variant="blue" style={{padding:16}}><b style={{fontFamily:'var(--font-serif)',fontSize:17}}>Why You'll Love It:</b><br/>·100% Natural Ingredients<br/>·No Preservatives</Card>
+      <Card variant="glass" style={{padding:16,backgroundImage:'url(../../assets/sky-clouds-wide.jpg)',backgroundSize:'cover',color:'#fff'}}><div style={{background:'var(--glass-bg)',backdropFilter:'blur(14px)',border:'1px solid var(--glass-border)',borderRadius:12,padding:10}}>Frosted glass over sky</div></Card>
+    </div>
+    <div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
+      <Badge color="blue">14 sachets</Badge><Badge>New</Badge><Badge color="ink">Clinically proven</Badge><Badge color="paper">Net wt. 504 g</Badge>
+      <Tag selected={f==='adult'} onClick={()=>setF('adult')}>Adult</Tag><Tag selected={f==='kids'} onClick={()=>setF('kids')}>Kids</Tag><Tag selected={f==='obeit'} onClick={()=>setF('obeit')}>OBEIT</Tag>
+    </div>
+    <div style={{display:'flex',gap:24,alignItems:'center'}}>
+      <StampFrame color="blue"><img src="../../assets/logo-stamp.png" width="72" alt="ZN"/></StampFrame>
+      <StampFrame color="red" inset={10}><span style={{fontFamily:'var(--font-serif)',color:'var(--zn-archival-paper)',fontWeight:700,fontSize:22}}>ZN*</span></StampFrame>
+      <RubberStamp size={120} text="100% Ingredient Transparency • " />
+      <RubberStamp size={120} color="blue" rotate={10} text="Clinically Proven For Health • " />
+    </div>
+  </div>;
+}
+function __mount(tries){ if(!window.ZeroNonsenseDesignSystem_e3dd65){ if(tries>0) return setTimeout(()=>__mount(tries-1),150); document.getElementById('root').innerHTML='<p style="font-family:monospace;padding:20px">Design-system bundle not compiled yet — reload this page.</p>'; return; } __render(); }
+__mount(30);
+function __render(){ ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+}
+</script></body></html>

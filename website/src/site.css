@@ -1,0 +1,1044 @@
+/* Zero Nonsense — site layer.
+   Tokens come from styles/*.css (the design-system package).
+
+   The page is built as a run of full-bleed colour bands, the way the packaging
+   deck presents the product: saturated flat ground, pack shot large, type big.
+   Each band's background is sampled from the ground of the mockup that sits on
+   it, so the pack bleeds into the colour instead of sitting in a box.
+
+   Rules carried over from the brand guidelines:
+
+   1. No gradients. Colour is flat and full strength.
+   2. The two pairings the guidelines forbid (p36) — Blueprint Ink on
+      Verification Stamp, Verification Stamp on Zero Black — never meet, so no
+      red band ever touches a blue or ink one.
+   3. Type colour per band is fixed by contrast: cream on red (display sizes
+      only, 3.6:1), Zero Black on blue (6.8:1) and on mango (6.7:1), cream on
+      ink (14:1), ink on paper (15:1). Small text on red goes inside a cream
+      chip. */
+
+:root {
+  --ink: #222222;                 /* Zero Black, guidelines p34 */
+  --paper: var(--zn-archival-paper);
+
+  /* Band grounds, sampled from the packaging mockups so artwork blends in. */
+  --red-field: #EB371E;           /* deck p03 / p06 ground */
+  --blue-field: #69AFF0;          /* deck p07 ground */
+  --mango-field: #FAA413;         /* Zero30 band ground, from the supplied design */
+  --mango-ink: #591F0B;           /* its type colour; 6.4:1 on the ground above */
+  --mango-strip: #FCE5AA;         /* the closing strip; mango ink on it is 10.4:1 */
+  --mango-btn: #4A1D08;           /* Archival Paper on it is 12.6:1 */
+
+  --red: var(--zn-verification-stamp);
+  --red-text: var(--zn-red-deep);  /* small red type on paper: 4.9:1 */
+  --blue: var(--zn-blueprint-ink);
+
+  --ink-70: rgba(34, 34, 34, 0.72);
+  --ink-45: rgba(34, 34, 34, 0.45);
+  --ink-18: rgba(34, 34, 34, 0.18);
+  --ink-10: rgba(34, 34, 34, 0.1);
+
+  --cream-80: rgba(243, 241, 228, 0.82);
+
+  --measure: 1240px;
+  --gutter: 28px;
+  --nav-h: 92px;   /* floating plate: 14 top + 58 tall + 6 shadow + air */
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-body-size);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: var(--weight-heading);
+  line-height: 1.02;
+  letter-spacing: var(--kerning-heading);
+  margin: 0;
+}
+
+p { margin: 0; }
+a { color: inherit; }
+/* height:auto is required — the width/height attributes on the <img> tags are
+   there to reserve layout space, but without this they also win over any CSS
+   aspect-ratio, which makes object-fit:cover crop a tall slice. */
+img { max-width: 100%; height: auto; display: block; }
+
+::selection { background: var(--ink); color: var(--paper); }
+
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+.band-red :focus-visible, .band-ink :focus-visible { outline-color: var(--paper); }
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 300;
+  background: var(--ink); color: var(--paper); padding: 12px 20px;
+  font-size: 12px; letter-spacing: var(--kerning-sub); text-transform: uppercase;
+}
+.skip:focus { left: 12px; top: 12px; }
+
+/* #products is left out: it is a full-screen section that already reserves the
+   nav's height in its own padding, the way the product bands do. Adding the
+   offset again pushes its last 92px under the fold. */
+#label, #ritual, #promise, #contact { scroll-margin-top: var(--nav-h); }
+
+/* ---------- bands ---------- */
+
+.wrap { width: min(var(--measure), calc(100vw - (var(--gutter) * 2))); margin: 0 auto; }
+
+.band { position: relative; padding: clamp(64px, 8vw, 118px) 0; }
+
+.band-paper { background: var(--paper); color: var(--ink); }
+.band-red { background: var(--red-field); color: var(--paper); }
+.band-blue { background: var(--blue-field); color: var(--ink); }
+.band-mango { background: var(--mango-field); color: var(--mango-ink); }
+
+/* The lineup stands on sky rather than paper: a lifted, softened patch of the
+   Blood Sugar hero frame's own sky, so the section reads as the same day as
+   the photography above it. The flat colour underneath is sampled from it, and
+   is what shows if the image has not loaded.
+
+   No grain over it — the grain layer is a multiply, which on a photograph
+   dirties it rather than giving it tooth. */
+/* The lineup is a one-screen section: heading, the three cards and the closing
+   line all sit inside the viewport without scrolling. Everything that eats
+   vertical space is therefore sized against vh as well as vw, so the section
+   compresses on a short laptop screen instead of pushing the cards under the
+   fold. */
+/* A definite height, not just a minimum. `flex: 1` on the grid resolves
+   against the column's height, and a min-height leaves that height
+   content-driven — so the grid sized itself to its contents, the image sized
+   itself to the grid, and the whole section grew past the screen it was meant
+   to fit. Everything inside is clamped against vh, so it compresses rather
+   than overflowing this box. */
+.band-sky {
+  height: 100svh;
+  min-height: 100svh;
+  display: flex;
+  align-items: stretch;
+  padding: calc(var(--nav-h) + var(--space-2)) 0 var(--space-4);
+  background-color: #CFE3F5;
+  background-image: url('/bg/sky.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: var(--ink);
+}
+
+/* The section is a column: heading, then the grid, then the closing line.
+   Centring the block instead left a band of empty sky under the nav and
+   stranded the cards low; giving the grid the slack puts it into the pack
+   shots, which are the thing worth looking at. */
+.band-sky > .wrap { display: flex; flex-direction: column; min-height: 0; }
+
+.range { flex: 1; min-height: 0; }
+
+/* Verification Stamp on sky is 4:1 — fine for the display sizes it is used at
+   elsewhere, not for an 11px caption. The eyebrow goes to ink here. */
+.band-sky .label { color: var(--ink); opacity: 0.78; }
+.band-sky .lede { color: rgba(34, 34, 34, 0.84); }
+.band-ink { background: var(--ink); color: var(--paper); }
+
+/* Paper and ink grounds get a fine grain so large flat areas are not dead
+   screen-colour. Kept very low; it should read as stock, not as texture. */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.32;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+.band-ink.grain::after { mix-blend-mode: screen; opacity: 0.12; }
+
+.band > .wrap { position: relative; z-index: 2; }
+
+/* ---------- type ---------- */
+
+/* Small uppercase caption. On a red band it becomes a cream chip, because
+   11px cream on red is 3.6:1 — fine for display sizes, not for this. */
+.label {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: var(--kerning-sub);
+  text-transform: uppercase;
+  color: var(--red-text);
+}
+
+.band-blue .label, .band-ink .label { color: inherit; opacity: 0.72; }
+.band-mango .label { color: inherit; opacity: 0.88; }
+
+/* The supplied design sets this band's button in the pack's own deep brown
+   rather than Zero Black, so it belongs to the mango palette. */
+.band-mango .btn { background: var(--mango-btn); border-color: var(--mango-btn); color: var(--paper); }
+.band-mango .fine { color: rgba(89, 31, 11, 0.78); }
+
+.chip {
+  display: inline-block;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 7px 13px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: var(--kerning-sub);
+  text-transform: uppercase;
+}
+
+.display { font-size: clamp(40px, 7vw, 92px); letter-spacing: -0.03em; }
+.h2 { font-size: clamp(32px, 5vw, 62px); }
+
+/* On red, body copy must be display-sized to clear contrast, so the lede is
+   set large and semibold rather than small and grey. */
+.lede { font-size: 17px; line-height: 1.5; color: var(--ink-70); max-width: 58ch; }
+
+/* Cream on Verification Stamp is 3.6:1 — that clears AA only as large text,
+   so copy on a red band is set at display size and semibold, never small. */
+.band-red .lede {
+  font-size: clamp(18px, 1.35vw, 20px);
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--paper);
+  max-width: 34ch;
+}
+
+.band-blue .lede, .band-mango .lede { color: rgba(34, 34, 34, 0.82); }
+.band-ink .lede { color: var(--cream-80); }
+
+.fine { font-size: 11px; line-height: 1.6; color: var(--ink-70); }
+.band-ink .fine, .band-red .fine { color: var(--cream-80); }
+
+.head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-7); }
+.head h2 { max-width: 20ch; }
+
+.rule { border: 0; border-top: 1px solid var(--ink-18); margin: 0; }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono);
+  font-size: var(--text-cta); font-weight: var(--weight-cta);
+  letter-spacing: var(--kerning-cta); text-transform: uppercase;
+  text-decoration: none; cursor: pointer;
+  padding: 15px 26px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--ink); color: var(--paper);
+  transition: transform var(--dur-fast) var(--ease-brand),
+              background var(--dur-fast) var(--ease-brand),
+              color var(--dur-fast) var(--ease-brand);
+}
+
+.btn:hover { transform: translateY(-2px); }
+
+.btn-outline { background: transparent; color: var(--ink); }
+.btn-outline:hover { background: var(--ink); color: var(--paper); }
+
+/* On red and ink the solid button is cream with ink type — an ink button on a
+   red ground would be the Verification Stamp / Zero Black pairing (p36). */
+.band-red .btn, .band-ink .btn { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.band-red .btn-outline, .band-ink .btn-outline { background: transparent; color: var(--paper); }
+.band-red .btn-outline:hover, .band-ink .btn-outline:hover { background: var(--paper); color: var(--ink); }
+
+.btn-sm { padding: 11px 18px; font-size: 12px; }
+
+/* ---------- nav ---------- */
+
+.nav-sentinel { position: absolute; top: var(--nav-h); left: 0; width: 1px; height: 1px; pointer-events: none; }
+
+/* A floating plate rather than a bar across the window. The hard offset shadow
+   is the package's own --shadow-pop idea: no blur, a solid ink slab behind the
+   plate, the way a rubber stamp or a letterpress block sits proud of the paper.
+   On scroll the plate presses down — the shadow shortens and the plate moves
+   into it — so the depth is real rather than decorative.
+   Type is ink on Archival Paper throughout (15:1); an earlier version sat
+   transparent over the red hero at 3.6:1 and was not readable. */
+.nav {
+  position: fixed;
+  inset: 14px 0 auto 0;
+  z-index: 200;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.nav-shell {
+  width: min(var(--measure), calc(100vw - 32px));
+  margin: 0 auto;
+  pointer-events: auto;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 6px 0 var(--ink);
+  transition: box-shadow var(--dur-med) var(--ease-brand),
+              transform var(--dur-med) var(--ease-brand);
+}
+
+.nav-solid .nav-shell { box-shadow: 0 3px 0 var(--ink); transform: translateY(3px); }
+
+.nav-in {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-5);
+  padding: 0 14px 0 18px;
+  height: 58px;
+  transition: height var(--dur-med) var(--ease-brand);
+}
+
+.nav-solid .nav-in { height: 50px; }
+
+.nav-brand { display: block; line-height: 0; }
+
+/* High-resolution mask keyed out of the packaging vector art (1400x409), so
+   the hand-drawn letterforms stay crisp and can take any brand colour. */
+.wordmark {
+  display: block;
+  background: var(--blue);
+  -webkit-mask: url('/assets/wordmark.png') left center / contain no-repeat;
+  mask: url('/assets/wordmark.png') left center / contain no-repeat;
+  aspect-ratio: 1400 / 409;
+}
+
+.nav-mark { width: 138px; background: var(--blue); transition: width var(--dur-med) var(--ease-brand); }
+.nav-solid .nav-mark { width: 122px; }
+
+.nav-links { display: flex; gap: var(--space-6); font-size: 13px; letter-spacing: 0.07em; text-transform: uppercase; }
+.nav-links a {
+  color: var(--ink); text-decoration: none; padding-bottom: 3px;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--dur-fast) var(--ease-brand);
+}
+.nav-links a:hover { border-bottom-color: var(--red); }
+
+.nav-end { display: flex; align-items: center; gap: var(--space-3); }
+
+.nav-toggle {
+  display: none; background: transparent; border: 2px solid var(--ink);
+  border-radius: var(--radius-sm); color: var(--ink);
+  font-family: var(--font-mono); font-size: 12px;
+  letter-spacing: var(--kerning-sub); text-transform: uppercase;
+  padding: 9px 14px; cursor: pointer;
+}
+
+.nav-drawer { display: none; flex-direction: column; border-top: 2px solid var(--ink); padding: var(--space-2) 18px var(--space-4); }
+.nav-drawer.open { display: flex; }
+.nav-drawer a { padding: 13px 0; border-bottom: 1px solid var(--ink-10); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+
+/* ---------- the range ---------- */
+
+/* Headline left, the standfirst against it, the hand-lettered mark closing the
+   row. Below the phone breakpoint they stack and the mark drops out: it is an
+   aside, and at phone width the column is needed for the sentence. */
+.range-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) auto;
+  gap: clamp(8px, 1.3vh, 22px) var(--space-6);
+  align-items: end;
+  margin-bottom: clamp(10px, 1.9vh, 32px);
+}
+
+.range-title { font-size: clamp(26px, min(4.1vw, 6.1vh), 56px); }
+
+.range-mark { width: clamp(96px, 9vw, 132px); height: auto; align-self: start; justify-self: end; }
+
+.range-title { max-width: none; }
+.range-title span { display: block; }
+
+/* The ruled last line, as the artwork draws it — Blueprint Ink here, where the
+   hero's frames use Verification Stamp. A flat bar; the guidelines rule out
+   the gradient a brush underline would need. */
+.range-title .is-marked { position: relative; display: inline-block; }
+
+.range-title .is-marked::after {
+  content: '';
+  position: absolute;
+  left: 0; right: -1.5%;
+  bottom: 0.04em;
+  height: 0.075em;
+  background: var(--blue);
+  border-radius: 2px;
+}
+
+.range { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(12px, 1.4vw, 24px); }
+
+/* The card is two zones, the way the artwork splits it: the pack stands in a
+   pale cast of its own product's colour, and everything you read sits below it
+   on Archival Paper. The tint is the pack's ground, not the card's. */
+.range-card {
+  display: flex; flex-direction: column;
+  height: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: 0 12px 34px rgba(31, 52, 84, 0.10);
+  text-decoration: none; color: inherit;
+  transition: transform var(--dur-med) var(--ease-brand),
+              box-shadow var(--dur-med) var(--ease-brand);
+}
+
+/* Content-sized, so every bit of slack in the card goes to the pack zone
+   instead of being split between the two. */
+.range-body {
+  flex: none;
+  display: flex; flex-direction: column;
+  gap: clamp(4px, 0.7vh, 9px);
+  padding: clamp(10px, 1.5vh, 18px);
+}
+
+/* Each tint is lighter than the sky behind it, so the card reads as a panel
+   laid on the ground rather than a hole cut in it. */
+.range-card[data-tone='blue']  { --tint: #E7F0FC; --accent: var(--zn-blue-deep); }
+.range-card[data-tone='red']   { --tint: #FBE8E2; --accent: var(--red); }
+.range-card[data-tone='mango'] { --tint: #FCEDCF; --accent: #C2740A; }
+
+a.range-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(31, 52, 84, 0.14); }
+
+/* All three packs are set to one height so the row reads level, whatever each
+   cut-out's own proportions are — the pouch is much taller than it is wide,
+   the cartons are nearly square. */
+/* The pack zone takes whatever height the card has spare, and the shot scales
+   into it rather than sitting at a fixed size with air above and below. */
+/* The pack is positioned out of flow on purpose. Left in flow it contributes
+   its intrinsic height to the card's min-content height, which puts a floor
+   under the card that the row cannot shrink past — the cards then overflow
+   their own row and paint over the closing line. Out of flow the zone is sized
+   purely by the flex column, and the pack scales into whatever it gets. */
+.range-shot {
+  position: relative;
+  flex: 1;
+  min-height: 90px;
+  overflow: hidden;
+  background: var(--tint);
+}
+
+/* An image is a replaced element: with `auto` sizes it keeps its intrinsic
+   dimensions however the insets are set, rather than stretching to them, so it
+   has to be told 100% of the box and given its breathing room as padding. */
+.range-shot img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  padding: clamp(10px, 1.8vh, 24px) clamp(10px, 1.4vw, 20px);
+  object-fit: contain;
+}
+
+.range-name { font-family: var(--font-serif); font-size: clamp(19px, min(2vw, 3.1vh), 28px); font-weight: 700; line-height: 1.1; }
+/* Two lines' worth, whether the claim fills them or not: the bodies are
+   content-sized now, so without this the one-line claim gives its card a
+   shorter body, a taller pack zone, and a pack bigger than its neighbours'. */
+.range-claim {
+  font-size: clamp(12px, 1.6vh, 13px);
+  line-height: 1.45;
+  min-height: 2.9em;
+  color: var(--ink-70);
+}
+
+/* The rule starts the card's bottom block, so rule, spec line and the way in
+   sit on the same baselines across all three cards however many lines each
+   claim runs to. */
+.range-rule { display: block; height: 1px; background: var(--ink-18); margin: clamp(8px, 1.4vh, 18px) 0 clamp(5px, 0.8vh, 10px); }
+
+/* Ink at 45% is 2.7:1 on these tints — nowhere near enough for a 10.5px
+   caption, however quiet it is meant to look. 72% clears AA on all three. */
+.range-spec { font-size: 10.5px; line-height: 1.7; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-70); }
+
+.range-go { padding-top: clamp(8px, 1.4vh, 18px); }
+
+.range-go-in {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: var(--kerning-sub); text-transform: uppercase;
+}
+
+/* The Zero30 pack's own line, closing the section. */
+.range-sign {
+  margin-top: clamp(12px, 2.2vh, 48px);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 1.15vw, 15px);
+  letter-spacing: var(--kerning-sub);
+  text-transform: uppercase;
+}
+
+.range-sign span { position: relative; display: inline-block; }
+
+.range-sign span::after {
+  content: '';
+  position: absolute;
+  left: 3%; right: 3%;
+  bottom: -11px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--blue);
+}
+
+/* ---------- hero ---------- */
+
+/* The hero is a pair of supplied frames, crossfading, with the site's own type
+   set live over them. The ground colour under each frame is sampled from the
+   part of it the copy lands on, so what the photograph letterboxes into on a
+   very wide screen is its own colour rather than a seam. */
+.hero {
+  position: relative;
+  color: var(--ink);
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: calc(var(--nav-h) + var(--space-5)) 0 var(--space-7);
+  transition: background 700ms var(--ease-brand);
+}
+
+/* cover, not contain: these are photographs, not cut-outs, so they fill the
+   band and crop at the edges the way a photograph should.
+
+   The crop is weighted to the top — 25%, not the usual centred 50% — because
+   the nav plate floats over the first ~106px of the band, and both frames carry
+   a hand-drawn annotation near their top edge. Centring the overflow slid those
+   annotations up under the nav.
+
+   25% is the balance point. Work the annotation's screen position out and the
+   image scale very nearly cancels: it lands at roughly a quarter of the band's
+   height from the top, whatever the viewport, which is ~145px at the shortest
+   desktop sizes and more everywhere else — always clear of the nav. Going
+   further (15%) clears the nav by more but starts cutting the cartons off at
+   the fold, and the cartons are the point. What 25% gives up is foreground at
+   the bottom of the frame, where there is nothing to read. */
+.hero-art { position: absolute; inset: 0; z-index: 1; }
+
+.hero-art img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  opacity: 0;
+  transition: opacity 700ms var(--ease-brand);
+}
+
+.hero-art img.is-on { opacity: 1; }
+
+.hero-in { position: relative; z-index: 2; width: 100%; }
+
+/* Must stay clear of the product, which sits in the right half of both frames.
+   The frames put the longest line, "Fewer Shortcuts.", at roughly 560px, so the
+   column and the display size are set to hold it on one line at full width. */
+.hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); max-width: min(600px, 46%); }
+
+.hero h1 { font-size: clamp(32px, 3.9vw, 56px); max-width: none; }
+
+/* The supplied frames break the headline by hand, so the lines are elements
+   rather than a wrapped paragraph — and above the phone breakpoint they are
+   held to the break the artwork makes rather than re-wrapping under it. */
+.hero-line { display: block; }
+
+@media (min-width: 881px) {
+  .hero-line { white-space: nowrap; }
+}
+
+/* The red frame rules its last line. A flat bar, not a gradient underline. */
+.hero-line.is-marked { position: relative; display: inline-block; }
+
+.hero-line.is-marked::after {
+  content: '';
+  position: absolute;
+  left: 0; right: -2%;
+  bottom: 0.02em;
+  height: 0.085em;
+  background: var(--red);
+  border-radius: 2px;
+}
+
+.hero .label { color: var(--ink); opacity: 0.8; }
+
+.hero .lede { color: rgba(34, 34, 34, 0.86); max-width: 34ch; }
+
+.hero-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+
+/* Which frame is showing, and the way to change it by hand.
+
+   These sit on photography, and the ground under them changes with the slide —
+   plaster on one frame, a blue cloth on the other — so a single ink tint cannot
+   stay legible. The inactive bar is cream with an ink hairline, which reads on
+   both; the active one is solid ink. */
+.hero-dots { display: flex; gap: 10px; margin-top: var(--space-5); }
+
+.hero-dot {
+  width: 34px; height: 6px; padding: 0;
+  border: 1px solid rgba(34, 34, 34, 0.4);
+  border-radius: 3px;
+  background: rgba(243, 241, 228, 0.72);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-brand),
+              border-color var(--dur-fast) var(--ease-brand);
+}
+
+.hero-dot.is-on { background: var(--ink); border-color: var(--ink); }
+.hero-dot:hover { background: var(--ink-70); border-color: var(--ink-70); }
+
+/* ---------- ticker ---------- */
+
+.ticker {
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+  padding: 18px 0;
+  border-top: 1px solid var(--ink-18);
+  border-bottom: 1px solid var(--ink-18);
+}
+
+.ticker-row { display: flex; gap: var(--space-6); white-space: nowrap; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; }
+
+.ticker-row span { flex: none; color: var(--ink-70); }
+.ticker-row .ast { color: var(--red-text); }
+
+/* ---------- product bands ---------- */
+
+/* The artwork is an absolutely positioned half, fitted with contain, not cover:
+   cover cropped the cartons off at the viewport edge. The band colour is
+   sampled from the mockup's own ground, so the margin contain leaves around the
+   pack fills with the identical colour — the pack stays whole and the bleed is
+   still seamless. Each band is sized to sit inside one screen. */
+.pband {
+  position: relative;
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: calc(var(--nav-h) + var(--space-5)) 0 var(--space-7);
+}
+
+.pband-art { position: absolute; top: 0; bottom: 0; width: 54%; z-index: 1; }
+.pband.art-right .pband-art { right: 0; }
+.pband.art-left .pband-art { left: 0; }
+
+.pband-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding: var(--space-5) var(--space-4);
+}
+
+.pband-in { position: relative; z-index: 2; width: 100%; }
+.pband.art-left .pband-in .wrap { display: flex; justify-content: flex-end; }
+
+.pband-copy {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: var(--space-4);
+  max-width: min(460px, 41%);
+}
+
+.pband-title { font-size: clamp(27px, 2.9vw, 42px); max-width: 15ch; }
+
+/* Headlines broken by hand where the artwork breaks them. */
+.pband-line { display: block; }
+
+.prod-claim { font-size: 14px; font-weight: 600; letter-spacing: 0.01em; }
+
+/* Four numbers off the pack's own panel, in place of a bullet list. */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: var(--space-5);
+  margin: 0;
+  padding: var(--space-4) 0 0;
+  border-top: 2px solid currentColor;
+  width: 100%;
+}
+
+/* A hairline and a divider between the pair, as the mango artwork draws it. */
+.band-mango .facts { border-top: 1px solid rgba(89, 31, 11, 0.32); }
+.band-mango .fact + .fact { border-left: 1px solid rgba(89, 31, 11, 0.32); padding-left: var(--space-5); }
+
+/* A pack with no nutrition panel has fewer numbers to show; above the phone
+   breakpoint the row tracks its own count so two facts are not left hanging in
+   a four-column grid. Below it the two-up rule in the media query governs, so
+   these are held behind the same min-width. */
+@media (min-width: 881px) {
+  .facts[data-facts="2"] { grid-template-columns: repeat(2, auto); }
+  .facts[data-facts="3"] { grid-template-columns: repeat(3, auto); }
+}
+
+.fact { display: flex; flex-direction: column-reverse; gap: 3px; }
+.fact dd { margin: 0; font-family: var(--font-serif); font-weight: 700; font-size: clamp(19px, 1.7vw, 25px); line-height: 1; font-variant-numeric: tabular-nums; }
+.fact dt { font-size: 10px; letter-spacing: var(--kerning-sub); text-transform: uppercase; opacity: 0.75; }
+
+.facts-note { font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; opacity: 0.75; }
+
+.free-from { font-size: 12.5px; line-height: 1.5; opacity: 0.9; }
+
+.pband-actions { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+
+/* A full-bleed closing strip under the band, carrying the pack's own line.
+   The band reserves room for it so the copy column cannot run underneath. */
+.pband.has-strip { padding-bottom: calc(var(--space-7) + clamp(56px, 9vh, 92px)); }
+
+.pband-strip {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 3;
+  background: var(--mango-strip);
+  color: var(--mango-ink);
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(16px, 3vw, 44px);
+  padding: clamp(14px, 2.2vh, 26px) var(--gutter);
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.05vw, 15px);
+  font-weight: 500;
+  letter-spacing: var(--kerning-sub);
+  text-transform: uppercase;
+}
+
+.pband-strip::before, .pband-strip::after {
+  content: '';
+  flex: 1 1 0;
+  max-width: 300px;
+  height: 1px;
+  background: rgba(89, 31, 11, 0.32);
+}
+
+/* The flavour plate, lifted off the pouch itself: the flavour boxed, and beside
+   it where the range stands. One flavour is in production, so it is a statement
+   and not a chooser — it becomes a chooser the day there is a second. */
+.flavour-plate { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; margin: 0; }
+
+/* On the mango band the artwork sets the flavour as a filled pill in the pale
+   strip colour rather than an outlined plate. */
+.band-mango .flavour-name {
+  border-color: transparent;
+  background: var(--mango-strip);
+  border-radius: var(--radius-pill);
+  padding: 9px 20px;
+}
+
+.flavour-name {
+  border: 2px solid currentColor;
+  border-radius: var(--radius-sm);
+  padding: 8px 15px;
+  font-family: var(--font-mono);
+  font-size: 13px; font-weight: 600;
+  letter-spacing: var(--kerning-sub); text-transform: uppercase;
+}
+
+.flavour-note { font-size: 11px; line-height: 1.5; opacity: 0.78; max-width: 24ch; }
+
+/* ---------- ritual ---------- */
+
+.ritual-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--space-5); margin-top: var(--space-7); }
+
+.step { border-top: 3px solid currentColor; padding-top: var(--space-4); }
+.step-no { font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--kerning-sub); opacity: 0.7; }
+.step h3 { font-size: clamp(26px, 2.6vw, 36px); margin: var(--space-2) 0; }
+.step p { font-size: 13px; line-height: 1.5; color: var(--ink-70); }
+.ritual-note { margin-top: var(--space-6); font-size: 13px; color: var(--ink-70); }
+
+.band-ink .step p,
+.band-ink .ritual-note { color: var(--cream-80); }
+
+/* ---------- the label ---------- */
+
+/* A SKU whose back panel has not been supplied is named under the tabs rather
+   than left out. Dashed, so it reads as a gap in the file and not as copy. */
+.label-missing {
+  margin-top: var(--space-6);
+  border: var(--border-dashed) var(--ink-45);
+  border-radius: 3px;
+  padding: var(--space-4) var(--space-5);
+  font-size: 12.5px; line-height: 1.6; color: var(--ink-70);
+  max-width: 68ch;
+}
+
+.tabs { display: flex; border-bottom: 1px solid var(--ink-18); margin-bottom: var(--space-6); flex-wrap: wrap; }
+
+.tab {
+  appearance: none; background: transparent; border: 0;
+  border-bottom: 3px solid transparent; margin-bottom: -1px;
+  padding: 14px 22px 12px;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  letter-spacing: var(--kerning-sub); text-transform: uppercase;
+  color: var(--ink-70); cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-brand), border-color var(--dur-fast) var(--ease-brand);
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--red); }
+
+/* ---------- card: the container every block on this page sits in ---------- */
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--ink-18);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--space-4);
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--ink-18);
+  background: rgba(34, 34, 34, 0.035);
+}
+
+.card-body { padding: 18px; }
+.card-body + .card-body { border-top: 1px solid var(--ink-10); }
+
+/* ---------- composition bar ---------- */
+
+/* A single-hue Blueprint Ink ramp, light-to-dark, with the unlisted remainder
+   in neutral. A multi-hue categorical scale is not available here: the brand
+   forbids Blueprint Ink against Verification Stamp (p36), which is exactly what
+   adjacent stacked segments would be. Ramp lightness is monotonic; the pale
+   steps sit below 3:1 on cream, so every segment is named and numbered in the
+   legend below and the full list is printed under it. */
+:root {
+  --comp-1: #1F4274;
+  --comp-2: #3A6BA8;
+  --comp-3: #5E97DF;
+  --comp-4: #93BCEC;
+  --comp-rest: #D8D3C0;
+}
+
+.comp { display: flex; gap: 2px; height: 52px; }
+
+.comp-seg {
+  position: relative;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(34, 34, 34, 0.16);
+  transition: transform var(--dur-fast) var(--ease-brand);
+}
+
+.comp-seg:first-child { border-radius: 5px 2px 2px 5px; }
+.comp-seg:last-child { border-radius: 2px 5px 5px 2px; }
+.comp-seg:hover { transform: translateY(-3px); }
+
+/* Tooltip, so a 2% sliver is still identifiable. */
+.comp-seg::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 50%; bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--ink); color: var(--paper);
+  font-size: 11px; letter-spacing: 0.04em;
+  padding: 6px 9px; border-radius: 3px;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease-brand);
+}
+
+.comp-seg:hover::after { opacity: 1; }
+
+.comp-scale { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10.5px; letter-spacing: 0.06em; color: var(--ink-45); }
+
+.swatch { width: 12px; height: 12px; border-radius: 2px; flex: none; box-shadow: inset 0 0 0 1px rgba(34, 34, 34, 0.16); }
+
+.sheet { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: var(--space-5); align-items: start; }
+.sheet-col { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.ing-list { list-style: none; margin: 0; padding: 0; }
+.ing-list li { padding: 13px 0; border-bottom: 1px solid var(--ink-10); }
+.ing-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.ing-top { display: flex; align-items: center; gap: var(--space-3); }
+.ing-name { font-weight: 600; font-size: 14.5px; flex: 1; }
+
+/* The percentage is the whole point of this section, so it is set at display
+   size rather than as a footnote. */
+.ing-pct { font-family: var(--font-serif); font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
+
+.ing-detail { margin: 5px 0 0 24px; font-size: 12.5px; line-height: 1.5; color: var(--ink-70); }
+.ing-rest { font-size: 12.5px; line-height: 1.6; color: var(--ink-70); }
+
+.nut-scroll { overflow-x: auto; }
+.nut { width: 100%; min-width: 320px; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.nut th, .nut td { padding: 7px 8px; text-align: right; border-bottom: 1px solid var(--ink-10); }
+.nut th:first-child, .nut td:first-child { text-align: left; padding-left: 0; }
+.nut td:last-child, .nut th:last-child { padding-right: 0; }
+.nut thead th { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-70); border-bottom: 2px solid var(--ink); vertical-align: bottom; }
+.nut tbody th { font-weight: 400; }
+
+.dv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--space-5); }
+.dv-row { display: flex; justify-content: space-between; gap: var(--space-3); padding: 7px 0; border-bottom: 1px solid var(--ink-10); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
+.meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-5); }
+.meta-grid h4 { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: var(--kerning-sub); text-transform: uppercase; color: var(--ink-70); margin-bottom: 6px; }
+.meta-grid p { font-size: 12.5px; line-height: 1.55; }
+
+.advisory { background: var(--ink); color: var(--paper); padding: 14px 18px; font-size: 11.5px; line-height: 1.5; }
+
+.stamps { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.stamp-chip { font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 11px; border: var(--border-dashed) var(--red); border-radius: 2px; color: var(--red-text); }
+
+.label-proof {
+  margin-top: var(--space-5);
+  display: grid;
+  grid-template-columns: auto minmax(220px, 1fr);
+  gap: var(--space-6);
+  align-items: center;
+  padding: var(--space-5);
+}
+
+.label-proof img { max-height: 420px; width: auto; border: 1px solid var(--ink-18); border-radius: 3px; }
+.label-proof-note { display: flex; flex-direction: column; gap: var(--space-3); }
+
+/* ---------- promise ---------- */
+
+.promise-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-6); margin-top: var(--space-7); }
+.promise-item { border-top: 3px solid currentColor; padding-top: var(--space-4); }
+.promise-item h3 { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: var(--kerning-sub); text-transform: uppercase; color: var(--red-text); margin-bottom: var(--space-3); }
+.promise-item p { font-size: 13.5px; line-height: 1.6; color: var(--ink-70); }
+
+.band-ink .promise-item h3 { color: var(--blue); }
+.band-ink .promise-item p { color: var(--cream-80); }
+
+/* ---------- footer ---------- */
+
+.footer-top { padding-bottom: 0; border-top: 1px solid var(--ink-18); }
+
+.footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-6); align-items: start; }
+.footer-col { display: flex; flex-direction: column; gap: 9px; font-size: 13px; }
+.footer-col .label { margin-bottom: 4px; }
+.footer-col a { color: var(--ink-70); text-decoration: none; }
+.footer-col a:hover { color: var(--red-text); text-decoration: underline; }
+.footer-email { word-break: break-all; }
+
+.footer-legal {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--ink-18);
+}
+
+/* Oversized wordmark with a hard ink offset — the header plate's letterpress
+   idea, closing the page. Two stacked masks because the source art is a
+   single-colour PNG. */
+.footer-giant {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1400 / 409;
+  margin: var(--space-8) 0 var(--space-6);
+}
+
+.footer-giant span {
+  position: absolute;
+  inset: 0;
+  -webkit-mask: url('/assets/wordmark.png') center / contain no-repeat;
+  mask: url('/assets/wordmark.png') center / contain no-repeat;
+}
+
+.fg-shadow { background: var(--ink); transform: translate(0.9%, 5%); }
+.fg-fill { background: var(--blue); }
+
+.footer-bar { background: var(--ink); color: var(--paper); }
+
+.footer-bar-in {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-4); flex-wrap: wrap;
+  padding: 16px 0;
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+.footer-bar-in a { color: var(--paper); text-decoration: none; text-transform: none; letter-spacing: 0.02em; }
+.footer-bar-in a:hover { text-decoration: underline; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1040px) {
+  .sheet, .label-proof { grid-template-columns: 1fr; gap: var(--space-6); }
+  .footer-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* One screen is a three-across idea. Once the cards stack there is no honest
+   way to hold the whole section inside the viewport, so below that the band
+   goes back to flowing normally and the pack zone takes a fixed ratio. */
+@media (max-width: 1040px) {
+  .range { grid-template-columns: repeat(2, minmax(0, 1fr)); flex: none; }
+  .band-sky { height: auto; min-height: 0; display: block; padding: calc(var(--nav-h) + var(--space-5)) 0 clamp(64px, 8vw, 110px); }
+  .band-sky > .wrap { display: block; }
+  .range-shot { aspect-ratio: 4 / 3; min-height: 0; }
+}
+
+@media (max-width: 680px) {
+  .range { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 880px) {
+  :root { --gutter: 18px; }
+
+  .range-head { grid-template-columns: 1fr; align-items: start; }
+  .range-mark { display: none; }
+
+  /* The frames crop hard at phone width, so the photograph stops being a
+     backdrop and becomes a picture above the copy. The slides still stack
+     inside it, so the crossfade is unchanged — only the box moves. */
+  .hero { min-height: 0; display: block; }
+  .hero-art {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    margin-bottom: var(--space-6);
+  }
+  .hero-copy { max-width: 100%; }
+  .hero-in { padding-bottom: 0; }
+
+  .pband { display: block; min-height: 0; padding-top: calc(var(--nav-h) + var(--space-4)); }
+  .pband-art { position: static; width: 100%; margin-top: var(--space-6); }
+  .pband-art img { height: auto; padding: 0; }
+  .pband-copy { max-width: 100%; }
+  .pband.art-left .pband-in .wrap { display: block; }
+
+  /* Four facts in a row is too tight on a phone. */
+  .facts { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+
+  .nav-links { display: none; }
+  .nav-toggle { display: inline-flex; }
+  .dv { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bar-in { justify-content: flex-start; }
+  .nut { font-size: 11.5px; }
+  .nut th, .nut td { padding: 6px 4px; }
+}
+
+/* Short viewports: the full-screen bands centre their copy, so on a laptop
+   screen the block can reach up under the floating header. Tighten the display
+   sizes and gaps rather than letting it collide. */
+@media (max-height: 800px) and (min-width: 881px) {
+  .hero h1 { font-size: clamp(30px, 3.4vw, 48px); }
+  .hero-copy { gap: var(--space-4); }
+  .band-red .lede { font-size: 17px; }
+  .pband-title { font-size: clamp(24px, 2.4vw, 34px); }
+  .pband-copy { gap: var(--space-3); }
+  .fact dd { font-size: 21px; }
+}
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

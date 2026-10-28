@@ -1,0 +1,13 @@
+:root{
+/* Shadows — flat brand; shadows only for floating glass layers */
+--shadow-glass:0 12px 40px rgba(31,52,84,0.18); /* @kind shadow */
+--shadow-pop:0 4px 0 rgba(30,28,24,1); /* hard offset, print-like */
+/* Airmail edge stripe (blue/red diagonals on paper) */
+--airmail-stripe:repeating-linear-gradient(45deg,var(--zn-blueprint-ink) 0 24px,var(--zn-archival-paper) 24px 40px,var(--zn-verification-stamp) 40px 64px,var(--zn-archival-paper) 64px 80px);
+/* Postage stamp scallop — apply as -webkit-mask on a square element */
+--stamp-scallop:radial-gradient(circle at 8px 8px,transparent 6px,#000 6.5px); /* @kind other */
+/* Motion */
+--ease-brand:cubic-bezier(.33,1,.68,1); /* @kind other */
+--dur-fast:150ms; /* @kind other */
+--dur-med:300ms; /* @kind other */
+}
