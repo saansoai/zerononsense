@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page not found — Zero Nonsense</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/assets/logo-stamp.png" />
+    <meta name="theme-color" content="#F3F1E4" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@400;700&family=Geist+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Standalone on purpose: a 404 has to render even when the app bundle is
+         the thing that failed to load, so the tokens it needs are inlined
+         rather than imported. The values are the site's own. -->
+    <style>
+      :root {
+        --ink: #222222;
+        --paper: #f3f1e4;
+        --blue: #5e97df;
+        --ink-70: rgba(34, 34, 34, 0.72);
+        --ink-18: rgba(34, 34, 34, 0.18);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100svh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 28px;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 15px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main { max-width: 620px; }
+
+      .wordmark {
+        display: block;
+        width: min(260px, 60vw);
+        height: 76px;
+        background: var(--blue);
+        -webkit-mask: url('/assets/wordmark.png') left center / contain no-repeat;
+        mask: url('/assets/wordmark.png') left center / contain no-repeat;
+      }
+
+      .label {
+        display: block;
+        margin: 40px 0 16px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-70);
+      }
+
+      h1 {
+        font-family: 'Averia Serif Libre', Georgia, serif;
+        font-weight: 700;
+        font-size: clamp(32px, 6vw, 54px);
+        line-height: 1.08;
+        margin: 0 0 20px;
+      }
+
+      p { margin: 0 0 28px; color: var(--ink-70); max-width: 46ch; }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 15px 26px;
+        border: 2px solid var(--ink);
+        border-radius: 2px;
+        background: var(--ink);
+        color: var(--paper);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+
+      .btn-outline { background: transparent; color: var(--ink); margin-left: 12px; }
+
+      :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+      .fine {
+        margin-top: 44px;
+        padding-top: 20px;
+        border-top: 1px solid var(--ink-18);
+        font-size: 11px;
+      }
+
+      @media (max-width: 520px) {
+        .btn-outline { margin: 12px 0 0; }
+        .actions { display: flex; flex-direction: column; align-items: flex-start; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <span class="wordmark" role="img" aria-label="Zero Nonsense"></span>
+      <span class="label">Error 404</span>
+      <h1>This page is not in the file.</h1>
+      <p>
+        Everything we print is on the homepage — the full ingredient list with percentages,
+        the nutritional panel and the licence numbers. Whatever you were after is most
+        likely there.
+      </p>
+      <div class="actions">
+        <a class="btn" href="/">Back to the homepage</a>
+        <a class="btn btn-outline" href="/#label">Read the full label</a>
+      </div>
+      <p class="fine">Saanso Nutri Sciences Pvt. Ltd. · Hyderabad, Telangana · info@saansonutri.com</p>
+    </main>
+  </body>
+</html>
