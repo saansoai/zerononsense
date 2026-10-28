@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { HERO_SLIDES, HERO_CTA } from './products.js';
 
 /* The hero runs the two supplied frames as a pair, blue first.
@@ -17,15 +16,19 @@ import { HERO_SLIDES, HERO_CTA } from './products.js';
    It keeps advancing under prefers-reduced-motion, but the swap becomes a cut
    rather than a fade: nothing here moves, slides or scales — it is a crossfade
    between two still photographs — and the reduced-motion rule in site.css
-   already flattens every transition to nothing, so the JS only has to match it
-   for the copy. */
+   already flattens every transition and animation to nothing, which covers the
+   photographs and the copy alike.
+
+   The copy block is keyed on the slide id, so React replaces it on every swap
+   and the CSS `hero-copy-in` animation runs fresh. That is the whole crossfade
+   — it needs no animation library, and an exit fade would mean holding two
+   `h1`s in the document at once, which is worse than the plain cut it saves. */
 const DWELL = 6500;
 const [CTA_LABEL, CTA_HREF] = HERO_CTA;
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
-  const reduced = useReducedMotion();
   const slide = HERO_SLIDES[index];
 
   const go = useCallback((next) => {
@@ -68,37 +71,28 @@ export default function Hero() {
 
       <div className="hero-in">
         <div className="wrap">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              className="hero-copy"
-              key={slide.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: reduced ? 0 : 0.4 }}
-            >
-              <span className="label label-ink">{slide.eyebrow}</span>
-              <h1>
-                {slide.lines.map((line, i) => (
-                  <span
-                    className={
-                      slide.markLast && i === slide.lines.length - 1
-                        ? 'hero-line is-marked'
-                        : 'hero-line'
-                    }
-                    key={line}
-                  >
-                    {line}
-                  </span>
-                ))}
-              </h1>
-              <p className="lede">{slide.blurb}</p>
-              <div className="hero-actions">
-                <a className="btn" href={CTA_HREF}>{CTA_LABEL}</a>
-                <a className="btn btn-outline" href="#products">See the products</a>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+          <div className="hero-copy" key={slide.id}>
+            <span className="label label-ink">{slide.eyebrow}</span>
+            <h1>
+              {slide.lines.map((line, i) => (
+                <span
+                  className={
+                    slide.markLast && i === slide.lines.length - 1
+                      ? 'hero-line is-marked'
+                      : 'hero-line'
+                  }
+                  key={line}
+                >
+                  {line}
+                </span>
+              ))}
+            </h1>
+            <p className="lede">{slide.blurb}</p>
+            <div className="hero-actions">
+              <a className="btn" href={CTA_HREF}>{CTA_LABEL}</a>
+              <a className="btn btn-outline" href="#products">See the products</a>
+            </div>
+          </div>
 
           <div className="hero-dots" role="group" aria-label="Choose a hero product">
             {HERO_SLIDES.map((s, i) => (

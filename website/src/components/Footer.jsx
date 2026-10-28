@@ -9,7 +9,7 @@ const YEAR = new Date().getFullYear();
    Ink on top. Replace both with the SVG when the brand supplies it. */
 export default function Footer() {
   return (
-    <footer id="contact">
+    <footer id="colophon">
       <div className="band band-paper grain footer-top">
         <div className="wrap">
           <div className="footer-grid">
@@ -30,6 +30,7 @@ export default function Footer() {
 
             <div className="footer-col">
               <span className="label">Contact</span>
+              <a href="#contact">Write to us</a>
               <a href={`mailto:${COMPANY.email}`} className="footer-email">{COMPANY.email}</a>
               <p className="fine">Hyderabad, Telangana</p>
             </div>
