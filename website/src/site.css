@@ -766,6 +766,41 @@ a.range-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(3
   max-width: 68ch;
 }
 
+/* Nonsense 0% · Hidden ingredients 0% · Fake claims 0% — ruled like a row of
+   the nutrition panel, the figure at display size in Verification Stamp (large
+   text, so 4:1 on paper clears AA). */
+.zero-line {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: calc(var(--space-3) * -1) 0 var(--space-7);
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--ink-18);
+}
+
+.zero-item {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+}
+.zero-item:first-child { padding-left: 0; }
+.zero-item:last-child { padding-right: 0; }
+.zero-item + .zero-item { border-left: 1px solid var(--ink-18); }
+
+.zero-item dt {
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: var(--kerning-sub); text-transform: uppercase;
+  color: var(--ink);
+}
+
+.zero-item dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 3.4vw, 44px); font-weight: 700; line-height: 1;
+  color: var(--red);
+  font-variant-numeric: tabular-nums;
+}
+
 .tabs { display: flex; border-bottom: 1px solid var(--ink-18); margin-bottom: var(--space-6); flex-wrap: wrap; }
 
 .tab {
@@ -961,7 +996,9 @@ a.range-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(3
 /* ---------- responsive ---------- */
 
 @media (max-width: 1040px) {
-  .sheet, .label-proof { grid-template-columns: 1fr; gap: var(--space-6); }
+  /* minmax(0, …), not 1fr: a bare 1fr track has the nutrition table's 320px
+     min-width as its floor, which pushed the cards off a 320px screen. */
+  .sheet, .label-proof { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
   .footer-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -1170,6 +1207,137 @@ a.range-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(3
 @media (max-width: 620px) {
   .contact-form { grid-template-columns: 1fr; }
   .contact-send { align-items: flex-start; flex-direction: column; gap: var(--space-3); }
+}
+
+/* ---------- phone ----------
+
+   At phone width the page was ~13,000px — fifteen screens. The desktop bands
+   are built to fill one screen each, and stacked naively that meant a pack shot
+   a screen tall above every product, three full-height lineup cards, and a
+   label section of loose cards. This layer compresses the page rather than
+   cutting anything from it: tighter band padding, artwork capped in height,
+   the lineup as compact rows, the step and fact grids two-up, and the footer's
+   columns kept side by side. It sits last so it wins over the rules above
+   without each one needing its own query. */
+
+@media (max-width: 880px) {
+  /* The plate is shorter at this width, so the offset it reserves is too. */
+  :root { --nav-h: 76px; }
+  .nav { inset: 10px 0 auto 0; }
+  .nav-in { height: 52px; padding: 0 10px 0 14px; gap: var(--space-3); }
+  .nav-solid .nav-in { height: 48px; }
+  .nav-mark, .nav-solid .nav-mark { width: 112px; }
+
+  .band { padding: var(--space-8) 0; }
+  .head { gap: var(--space-3); margin-bottom: var(--space-6); }
+  .lede { font-size: 15px; }
+
+  /* The full-screen bands drop their nav-height padding below this width, so
+     an anchor jump has to clear the plate on its own. */
+  #products, .pband { scroll-margin-top: var(--nav-h); }
+
+  /* Hero: picture, then the copy, with the two actions side by side. */
+  .hero { padding: calc(var(--nav-h) + var(--space-3)) 0 var(--space-6); }
+  .hero-art { aspect-ratio: 16 / 10; margin-bottom: var(--space-5); }
+  .hero-copy { gap: var(--space-4); }
+  .hero-actions { width: 100%; flex-wrap: nowrap; }
+  .hero-actions .btn { flex: 1 1 0; justify-content: center; text-align: center; padding: 13px 10px; font-size: 12px; }
+  .hero-dots { margin-top: var(--space-4); }
+
+  /* Lineup: ordinary band padding now that it no longer fills a screen. */
+  .band-sky { padding: var(--space-8) 0; }
+  .range-head { margin-bottom: var(--space-5); }
+  .range-sign { margin-top: var(--space-6); }
+
+  /* Product bands: the pack shot is capped so it reads as a picture above the
+     copy rather than a screen of colour before it. */
+  .pband { padding: var(--space-6) 0 var(--space-7); }
+  .pband.has-strip { padding-bottom: calc(var(--space-7) + 52px); }
+  .pband-art { margin: 0 0 var(--space-5); }
+  .pband-art img { width: auto; max-width: 100%; max-height: 260px; margin: 0 auto; }
+  .pband-copy { gap: var(--space-3); }
+  .pband-strip { padding: 14px var(--gutter); font-size: 11px; gap: 12px; }
+
+  /* Ritual: four steps two-up. */
+  .ritual-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); margin-top: var(--space-6); }
+  .step h3 { font-size: 24px; }
+
+  .promise-grid { gap: var(--space-5); margin-top: var(--space-6); }
+}
+
+@media (max-width: 600px) {
+  .h2 { font-size: clamp(28px, 8vw, 34px); }
+  .head h2, .contact h2 { font-size: clamp(26px, 7.4vw, 32px); }
+
+  /* The lineup as rows — pack on the left, name and claim beside it — so the
+     three read as one list instead of three screens. */
+  .range { gap: var(--space-3); }
+  .range-card { flex-direction: row; min-height: 0; }
+  .range-shot { flex: 0 0 38%; aspect-ratio: auto; min-height: 150px; }
+  .range-shot img { padding: 10px; }
+  .range-body { flex: 1; min-width: 0; gap: 4px; padding: 12px 14px; justify-content: center; }
+  .range-name { font-size: 19px; }
+  .range-claim { min-height: 0; font-size: 12px; }
+  .range-rule { display: none; }
+  .range-spec { font-size: 9.5px; line-height: 1.55; margin-top: 4px; }
+  .range-go { padding-top: 6px; }
+  .range-go-in { font-size: 11px; padding-bottom: 3px; }
+  .range-sign { font-size: 11px; }
+
+  /* Product facts two-up, tighter. */
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-4); padding-top: var(--space-3); }
+  .fact dd { font-size: 21px; }
+  .free-from { font-size: 12px; }
+
+  .ritual-note, .step p { font-size: 12.5px; }
+  .promise-item p { font-size: 13px; }
+
+  /* The open file: the zero line stacks its three figures across a row, and
+     the panels tighten. */
+  .zero-line { margin-top: calc(var(--space-2) * -1); margin-bottom: var(--space-6); }
+  .zero-item { flex-direction: column-reverse; align-items: flex-start; justify-content: flex-end; gap: 6px; padding: var(--space-3) var(--space-3); }
+  .zero-item dt { font-size: 9.5px; letter-spacing: 0.08em; line-height: 1.35; }
+  .zero-item dd { font-size: 28px; }
+
+  .tabs { margin-bottom: var(--space-5); }
+  .tab { flex: 1 1 0; padding: 12px 8px 10px; }
+  .sheet, .sheet-col { gap: var(--space-4); }
+  .card-head { padding: 10px 14px; flex-wrap: wrap; gap: 2px var(--space-3); }
+  .card-body { padding: 14px; }
+  .comp { height: 36px; }
+  .ing-list li { padding: 10px 0; }
+  .ing-name { font-size: 13.5px; }
+  .ing-pct { font-size: 22px; }
+  .ing-detail { margin-left: 24px; font-size: 11.5px; }
+  .dv { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--space-4); }
+  .dv-row { font-size: 11.5px; padding: 6px 0; }
+  .meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+  .meta-grid > div:first-child { grid-column: 1 / -1; }
+  .advisory { padding: 12px 14px; font-size: 11px; }
+
+  /* The source panel as a thumbnail beside its note, not a full-width image. */
+  .label-proof { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-4); padding: var(--space-4); }
+  .label-proof img { width: 96px; max-height: none; }
+  .label-proof .lede { font-size: 12.5px !important; }
+  .label-missing { padding: var(--space-3) var(--space-4); font-size: 11.5px; margin-top: var(--space-5); }
+
+  /* Contact: the aside repeats what the footer prints in full, so at this
+     width it keeps only the direct address. */
+  .contact-form { gap: var(--space-4); }
+  .contact-aside .contact-block:not(:first-child), .contact-advisory { display: none; }
+  .contact-send { flex-direction: row; align-items: center; }
+
+  /* Footer: link columns two-up, legal tighter, the wordmark closer. */
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); }
+  .footer-col { gap: 6px; font-size: 12.5px; }
+  .footer-legal { margin-top: var(--space-5); gap: var(--space-4); }
+  .footer-giant { margin: var(--space-6) 0 var(--space-4); }
+  .footer-bar-in { gap: 6px var(--space-4); padding: 14px 0; font-size: 10px; }
+}
+
+@media (max-width: 360px) {
+  .nav-cta { display: none; }
+  .zero-item dd { font-size: 24px; }
 }
 
 /* ---------- reduced motion ---------- */

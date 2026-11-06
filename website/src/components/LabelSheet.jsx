@@ -20,7 +20,9 @@ import { PRODUCTS, COMPANY } from './products.js';
 const SHEETS = PRODUCTS.filter((product) => product.nutrition);
 const UNPRINTED = PRODUCTS.filter((product) => !product.nutrition);
 
-const RAMP = ['var(--comp-1)', 'var(--comp-2)', 'var(--comp-3)', 'var(--comp-4)'];
+const ZEROES = ['Nonsense', 'Hidden ingredients', 'Fake claims'];
+
+const RAMP =['var(--comp-1)', 'var(--comp-2)', 'var(--comp-3)', 'var(--comp-4)'];
 
 function composition(product) {
   const parts = product.ingredients.map(([name, pct], i) => ({
@@ -221,6 +223,19 @@ export default function LabelSheet() {
               on this page.
             </p>
           </div>
+        </Reveal>
+
+        {/* The three things the composition bar has no segment for, because
+            there is none in the sachet. Set like a line off the panel. */}
+        <Reveal>
+          <dl className="zero-line">
+            {ZEROES.map((name) => (
+              <div className="zero-item" key={name}>
+                <dt>{name}</dt>
+                <dd>0%</dd>
+              </div>
+            ))}
+          </dl>
         </Reveal>
 
         <div className="tabs" role="tablist" aria-label="Choose a product label">
